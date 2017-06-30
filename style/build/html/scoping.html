@@ -1,0 +1,438 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Scoping &mdash; Google C++ Style Guide 1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Google C++ Style Guide 1.0 documentation" href="index.html"/>
+        <link rel="next" title="Classes" href="classes.html"/>
+        <link rel="prev" title="Header Files" href="header_files.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Google C++ Style Guide
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="header_files.html">Header Files</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Scoping</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#namespaces">Namespaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#unnamed-namespaces-and-static-variables">Unnamed Namespaces and Static Variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#nonmember-static-member-and-global-functions">Nonmember, Static Member, and Global Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#local-variables">Local Variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#static-and-global-variables">Static and Global Variables</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="other_cpp_features.html">Other C++ Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="naming.html">Naming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comments.html">Comments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formatting.html">Formatting</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Google C++ Style Guide</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Scoping</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="scoping">
+<h1>Scoping<a class="headerlink" href="#scoping" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="namespaces">
+<h2>Namespaces<a class="headerlink" href="#namespaces" title="Permalink to this headline">¶</a></h2>
+<p>With few exceptions, place code in a namespace. Namespaces should have unique names based on the project name and possibly its path. Do not use <em>using-dierectives</em> (e.g. <code class="docutils literal"><span class="pre">using</span> <span class="pre">namespace</span> <span class="pre">foo</span></code>). Do not using inline namespaces. For unnamed namespaces see <a class="reference internal" href="#unnamed-namespaces-and-static-variables">Unnamed Namespaces and Static Variables</a>.</p>
+<dl class="docutils">
+<dt>Definition:</dt>
+<dd>Namespaces subdivide the global scope into distinct, named scopes, and so are useful for preventing name collisions in the global scope.</dd>
+<dt>Pros:</dt>
+<dd><p class="first">Namespaces provide a method for preventing name conflicts in large programs while allowing most code to be used reasonably short names.</p>
+<p>For example, if two different projects have a class <code class="docutils literal"><span class="pre">foo</span></code> in the global scope, these symbols may collide at compile time or at runtime. If each project places their code in a namespace, <code class="docutils literal"><span class="pre">projectt1::Foo</span></code> and <code class="docutils literal"><span class="pre">project2::Foo</span></code> are now distinct symbols that do not collide, and code within each project’s namespace can continue to refer to <code class="docutils literal"><span class="pre">Foo</span></code> without the prefix.</p>
+<p class="last">Inline namespaces automatically place their names in the enclosing scope. Consider the following snippet, for example:</p>
+</dd>
+</dl>
+<div class="highlight-c++"><div class="highlight"><pre><span class="k">namespace</span> <span class="n">X</span> <span class="p">{</span>
+  <span class="kr">inline</span> <span class="k">namespace</span> <span class="n">Y</span> <span class="p">{</span>
+    <span class="kt">void</span> <span class="n">foo</span><span class="p">();</span>
+  <span class="p">}</span> <span class="c1">// namespace Y</span>
+<span class="p">}</span> <span class="c1">// namespace X</span>
+</pre></div>
+</div>
+<p>The expressions <code class="docutils literal"><span class="pre">X::Y::foo()</span></code> and <code class="docutils literal"><span class="pre">X::foo()</span></code> are interchangeable. Inline namespaces are primarily intended for ABI compatibility across versions.</p>
+<dl class="docutils">
+<dt>Cons:</dt>
+<dd><p class="first">Namespaces can be confusing, because they complicate the mechanics of figuring out what definition a name refers to.</p>
+<p>Inline namespaces, in particular, can be confusing because names aren’t actually restricted to the namespace where they are declared. They are only useful as part of some larger versioning policy.</p>
+<p class="last">In some contexts, it’s necessary to repeatedly refer to symbols by their fully qualified names. For deeply-nested namespaces, this can add a lot of clutter.</p>
+</dd>
+<dt>Decision:</dt>
+<dd><p class="first">Namespaces should be used as follows:</p>
+<ul class="last simple">
+<li>Follow the rules on <a href="#id1"><span class="problematic" id="id2">`Namespace Names`_</span></a>.</li>
+<li>Terminate namespaces with comments as showing in the given examples.</li>
+<li>Namespaces wrap the entire source file after includes, <a href="#id3"><span class="problematic" id="id4">`gflags`_</span></a>, definitions/declarations and forward declarations of classes from other namespaces.</li>
+</ul>
+</dd>
+</dl>
+<div class="highlight-c++"><div class="highlight"><pre><span class="c1">// In the .hpp file</span>
+<span class="k">namespace</span> <span class="n">mynamespace</span> <span class="p">{</span>
+
+  <span class="c1">// All declarations are within the namespace scope.</span>
+  <span class="k">class</span> <span class="nc">MyClass</span> <span class="p">{</span>
+   <span class="k">public</span><span class="o">:</span>
+    <span class="p">...</span>
+    <span class="kt">void</span> <span class="n">Foo</span><span class="p">();</span>
+  <span class="p">};</span>
+
+<span class="p">}</span> <span class="c1">// namespace mynamespace</span>
+</pre></div>
+</div>
+<div class="highlight-c++"><div class="highlight"><pre><span class="c1">// In the .cpp file</span>
+<span class="k">namespace</span> <span class="n">mynamespace</span> <span class="p">{</span>
+
+  <span class="c1">//Definition of functions in within scope of the namespace.</span>
+  <span class="kt">void</span> <span class="n">MyClass</span><span class="o">::</span><span class="n">Foo</span><span class="p">()</span> <span class="p">{</span>
+    <span class="p">..</span>
+  <span class="p">}</span>
+
+<span class="p">}</span> <span class="c1">// namespace mynamespace</span>
+</pre></div>
+</div>
+<p>More complex <code class="docutils literal"><span class="pre">.cpp</span></code> files might have additional details, like flags or using-declarations.</p>
+<blockquote>
+<div><ul class="simple">
+<li>Do not declare anything in namespace <code class="docutils literal"><span class="pre">std</span></code>, including forward declarations of standard library classes. Declaring entities in namespace <code class="docutils literal"><span class="pre">std</span></code> is undefined behavior, e.g., not portable. To declare entities from the standard library, include the appropriate header file.</li>
+<li>You may not use a <em>using-directive</em> to make all names form a namespace available.</li>
+</ul>
+</div></blockquote>
+<div class="highlight-c++"><div class="highlight"><pre><span class="c1">// Forbidden -- This pollutes the namespace.</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">foo</span><span class="p">;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>Do not use <em>Namespace aliases</em> at namespace scope in header files except in explicitly marked internal-only namespace, because anything imported into a namespace in a header file becomes part of the public API exported by that file</li>
+</ul>
+<div class="highlight-c++"><div class="highlight"><pre><span class="c1">// Shorten access to some commonly used names in .cpp files.</span>
+<span class="k">namespace</span> <span class="n">bax</span> <span class="o">=</span> <span class="o">::</span><span class="n">foo</span><span class="o">::</span><span class="n">bar</span><span class="o">::</span><span class="n">baz</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="highlight-c++"><div class="highlight"><pre><span class="c1">// Shorten access to some commonly used names (in a .hpp file).</span>
+<span class="k">namespace</span> <span class="n">librarian</span> <span class="p">{</span>
+  <span class="k">namespace</span> <span class="n">impl</span> <span class="p">{</span> <span class="c1">// Internal, not part of the API.</span>
+    <span class="k">namespace</span> <span class="n">sidetable</span> <span class="o">=</span> <span class="o">::</span><span class="n">pipline_diagnostics</span><span class="o">::</span><span class="n">sidetable</span><span class="p">;</span>
+  <span class="p">}</span> <span class="c1">// namespace impl</span>
+
+  <span class="kr">inline</span> <span class="kt">void</span> <span class="n">my_inline_function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// namespace alias local to a function (or method).</span>
+    <span class="k">namespace</span> <span class="n">bax</span> <span class="o">=</span> <span class="o">::</span><span class="n">foo</span><span class="o">::</span><span class="n">bar</span><span class="o">::</span><span class="n">baz</span><span class="p">;</span>
+    <span class="p">...</span>
+  <span class="p">}</span>
+<span class="p">}</span> <span class="c1">// namespace librarian</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>Do not use inline namespaces.</li>
+</ul>
+</div>
+<div class="section" id="unnamed-namespaces-and-static-variables">
+<h2>Unnamed Namespaces and Static Variables<a class="headerlink" href="#unnamed-namespaces-and-static-variables" title="Permalink to this headline">¶</a></h2>
+<p>When definitions in a <code class="docutils literal"><span class="pre">.cpp</span></code> file do not need to be referenced outside that file, place them in an unnamed namespace or declare them <code class="docutils literal"><span class="pre">static</span></code>. Do not use either of these constructs in <code class="docutils literal"><span class="pre">.hpp</span></code> files.</p>
+<dl class="docutils">
+<dt>Definition:</dt>
+<dd>All declarations can be given internal linkage by placing them in unnamed namespaces, and functions and variables can be given internal linkage by declaring them <code class="docutils literal"><span class="pre">static</span></code>. This means that anything you’re declaring can’t be accessed from another file. If a different file declares something with the same name, then the two entities are completely independent.</dd>
+<dt>Decision:</dt>
+<dd><p class="first">Use of internal linkage in <code class="docutils literal"><span class="pre">.cpp</span></code> files is encouraged for all code that does not need to be referenced elsewhere. Do not use internal linkage in <code class="docutils literal"><span class="pre">.hpp</span></code> files.</p>
+<p class="last">Format unnamed namespace like named namespace in the terminating comment, leave the namespace name empty:</p>
+</dd>
+</dl>
+<div class="highlight-c++"><div class="highlight"><pre><span class="k">namespace</span> <span class="p">{</span>
+  <span class="p">...</span>
+<span class="p">}</span> <span class="c1">// namespace</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="nonmember-static-member-and-global-functions">
+<h2>Nonmember, Static Member, and Global Functions<a class="headerlink" href="#nonmember-static-member-and-global-functions" title="Permalink to this headline">¶</a></h2>
+<p>Prefer placing nonmember functions in a namespace; use completely global functions rarely. Prefer grouping functions within a namespace instead of using a class as if it were a namesapce. Static methods of a class should generally be closely related to instances of the class or the class’s static data.</p>
+<dl class="docutils">
+<dt>Pros:</dt>
+<dd>Nonmember and static member functions can be useful in some situations. Putting nonmember functions in a namespace avoids polluting the global namespace.</dd>
+<dt>Cons:</dt>
+<dd>Nonmember and static member functions may make more sense as members of a new class, especially if they access external resources or have significant dependencies.</dd>
+<dt>Decision:</dt>
+<dd>Sometimes it is useful to define a function not bound to a class instance. Such a function can be either a static member of a nonmember function. Nonmember functions should not depend on external variables, and should nearly always exist in a namespace. Rather than creating classes only to group static member functions which do not share static data, use <a class="reference internal" href="#namespaces">Namespaces</a> instead. For a header <code class="docutils literal"><span class="pre">myproject/foo_bar.h</span></code>, for example, write</dd>
+</dl>
+<div class="highlight-c++"><div class="highlight"><pre><span class="k">namespace</span> <span class="n">myproject</span> <span class="p">{</span>
+  <span class="k">namespace</span> <span class="n">foo_bar</span> <span class="p">{</span>
+    <span class="kt">void</span> <span class="n">Function1</span><span class="p">();</span>
+    <span class="kt">void</span> <span class="nf">Function2</span><span class="p">();</span>
+  <span class="p">}</span> <span class="c1">// namespace foo_bar</span>
+<span class="p">}</span> <span class="c1">// namespace myproject</span>
+</pre></div>
+</div>
+<p>instead of</p>
+<div class="highlight-c++"><div class="highlight"><pre><span class="k">namespace</span> <span class="n">myproject</span> <span class="p">{</span>
+  <span class="k">class</span> <span class="nc">FooBar</span> <span class="p">{</span>
+   <span class="k">public</span><span class="o">:</span>
+    <span class="k">static</span> <span class="kt">void</span> <span class="n">Function1</span><span class="p">();</span>
+    <span class="k">static</span> <span class="kt">void</span> <span class="nf">Function2</span><span class="p">();</span>
+  <span class="p">};</span>
+<span class="p">}</span> <span class="c1">// namespace myproject</span>
+</pre></div>
+</div>
+<p>If you define a nonmember function and it is only needed in its <code class="docutils literal"><span class="pre">.cpp</span></code> file, use <a href="#id5"><span class="problematic" id="id6">`Internal Linkage`_</span></a> to limit its scope.</p>
+</div>
+<div class="section" id="local-variables">
+<h2>Local Variables<a class="headerlink" href="#local-variables" title="Permalink to this headline">¶</a></h2>
+<p>Place a function’s variables in the narrowest scope possible, and initialize variables in the declaration.</p>
+<p>C++ allows you to declare variables anywhere in a function. We encourage you to declare them in as local a scope as possible, and as close to the first use as possible. This makes it easier for the reader to find the declaration and see what type the variable is and what it was initialized to. In particular, initialization should be used instead of declaration and assignment, e.g.:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+<span class="n">i</span> <span class="o">=</span> <span class="n">f</span><span class="p">();</span> <span class="c1">// Bad -- initialization separate from declaration.</span>
+</pre></div>
+</div>
+<div class="highlight-c++"><div class="highlight"><pre><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">g</span><span class="p">()</span> <span class="c1">// Good -- declaration has initialization.</span>
+</pre></div>
+</div>
+<div class="highlight-c++"><div class="highlight"><pre><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">v</span><span class="p">;</span>
+<span class="n">v</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// Prefer initializing using brace initialization.</span>
+<span class="n">v</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="highlight-c++"><div class="highlight"><pre><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">v</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">};</span> <span class="c1">// Good -- v starts initialized.</span>
+</pre></div>
+</div>
+<p>Variables needed for <code class="docutils literal"><span class="pre">if</span></code>, <code class="docutils literal"><span class="pre">while</span></code>, and <code class="docutils literal"><span class="pre">for</span></code> statements should normally be declared within those statements, so that such variables are confined to those scopes. E.g.:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span class="k">while</span> <span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">p</span> <span class="o">=</span> <span class="n">strchr</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="sc">&#39;/&#39;</span><span class="p">))</span> <span class="n">str</span> <span class="o">=</span> <span class="n">p</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>There is one caveat: if the variable is an object, its constructor is invoked every time it enters scope and is created, and its destructor is invoked every time it goes out of scope.</p>
+<div class="highlight-c++"><div class="highlight"><pre><span class="c1">// Inefficient implementation:</span>
+<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">1000000</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">Foo</span> <span class="n">f</span><span class="p">;</span> <span class="c1">// My ctor and dtor get called 1000000 times each.</span>
+  <span class="n">f</span><span class="p">.</span><span class="n">DoSomething</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>It may be more efficient to declare such a variable used in a loop outside that loop:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span class="n">Foo</span> <span class="n">f</span><span class="p">;</span> <span class="c1">// My ctor and dtor get called once each.</span>
+<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">1000000</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">f</span><span class="p">.</span><span class="n">DoSOmething</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="static-and-global-variables">
+<h2>Static and Global Variables<a class="headerlink" href="#static-and-global-variables" title="Permalink to this headline">¶</a></h2>
+<p>Variables of class type with <a href="#id7"><span class="problematic" id="id8">`Static Sotrage Duration`_</span></a> are forbidden: they cause hard-to-find bugs due to indeterminate order of construction and destruction. However, such variables are allowed if they are <code class="docutils literal"><span class="pre">constexpr</span></code>: they have no dynamic initialization or destruction.</p>
+<p>Objects with static storage duration, including global variables, static variables, static class member variables, and function static variables, must be Plain Old Data (POD): only ints, chars, floats, or pointers, or arrays/structs of POD.</p>
+<p>The order in which class constructors and initializers for static variables are called is only partially specified in C++ and can be even changed from build to build, which can cause bugs that are difficult to find. Therefor in addition to banning globals of class type, we do not allow non-local static variables to be initialized with the result of a function, unless that function (such as <code class="docutils literal"><span class="pre">getenv()</span></code>, or <code class="docutils literal"><span class="pre">getpid()</span></code>) does not itself depend on any other globals. However, a static POD variable within function scope may be initialized with a result of a function, since its initialization order is well-defined and does not occurs until control passes through its declaration.</p>
+<p>Likewise, global and static variables are destroyed when the program terminates, regardless of whether the termination is by returning from <code class="docutils literal"><span class="pre">main()</span></code> or by calling <code class="docutils literal"><span class="pre">exit()</span></code>. The order in which destructors are called is defined to be the reverse of the order in which the constructors were called. Since constructors order is indeterminate, so is destructor order. For Example, at program-end time a static variable might have been destroyed, but code still running – perhaps in another thread – tries to access it and fills. Or the destructor for a static <code class="docutils literal"><span class="pre">string</span></code> variable might be run prior to the destructor for another variable that contains a reference to that string.</p>
+<p>One way to alleviate the destructor problem is to terminate the program by calling <code class="docutils literal"><span class="pre">quick_exit()</span></code> instead of <code class="docutils literal"><span class="pre">exit()</span></code>. The difference is that <code class="docutils literal"><span class="pre">quick_exit()</span></code> does not invoke destructors and does not invoke any handlers that were registered by calling <code class="docutils literal"><span class="pre">atexit()</span></code>. If you have a handler that needs to run when a program terminates via <code class="docutils literal"><span class="pre">quick_exit()</span></code> (flushing logs, for example), you can register it using <code class="docutils literal"><span class="pre">at_quick_exit()</span></code>. (if you have a handler that need to run at both <code class="docutils literal"><span class="pre">exit()</span></code> and <code class="docutils literal"><span class="pre">quick_exit()</span></code>, you need to register it in both places.)</p>
+<p>As a result we only allow static variables to contain POD data. This rule completely disallows <code class="docutils literal"><span class="pre">std::vector</span></code> (use C arrays instead), or <code class="docutils literal"><span class="pre">string</span></code> (use <code class="docutils literal"><span class="pre">const</span> <span class="pre">char</span> <span class="pre">[]</span></code>).</p>
+<p>If you need a static or global variable of a class type, consider initializing a pointer (which will never be freed), from either your <code class="docutils literal"><span class="pre">main()</span></code> function or from <code class="docutils literal"><span class="pre">pthread_once()</span></code>. Noe that this must be a raw pointer, not a “smart” pointer, since the smart pointer’s destructor will have the order-of-destructor issue that we are trying to avoid.</p>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="classes.html" class="btn btn-neutral float-right" title="Classes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="header_files.html" class="btn btn-neutral" title="Header Files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017 Arden Rasmussen.
+
+    </p>
+  </div> 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

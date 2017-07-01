@@ -121,20 +121,133 @@ If you do not want to support copy/move operations on your type, explicity disab
 Structs vs. Classes
 ===================
 
+Use a ``struct`` only for passive objects that carry data; everything else is a ``class``.
+
+The ``struct`` and ``class`` keywords behave almost identically in C++. We add our own semantic meanings to each keyword, so you should use the appropriate keyword for the data-type your defining.
+
+``struct``\s should be used for passive objects that carry data, and may have associated constants, but lack any funcionality other than access/setting the data members. The access/setting of fields is done by directly accessing the fields rather than through method invocations. Methods should not provide behavior by should only be used to set up the data members e.g., ``constructor``, ``destructor``, ``Initialize()``, ``Reset()``, ``Validate()``.
+
+If more functionality is required, a ``class`` is more appropriate. If in doubt, make it a ``class``.
+
+Conf consistency with Stl you can use ``struct`` instead of ``class`` for functor and traits.
+
+Note that member variables in structs and classes have `Different Naming Rules`_.
+
 Inheritance
 ===========
+
+Composition is often more appropriate than inheritance. When using inheritance, make it ``public``.
+
+Definition:
+  When a sub-class inherits form a base class, it includes the definitions of all the data and operations that the parent base class defines. In practice, inheritance is used in two major ways in C++: implementation inheritance, in which actual code is inherited by the child, and `Interface Inheritance`_, in which only method names are inherited.
+
+Pros:
+  Implementation inheritace reduces code size by re-using the base class code as it specializes an existing type. Because inheritance is a compile-time declaration, you and the compiler can understand the operation and detect errors. Interface inheritance can be used to programmatically enforce that a class expose a particular API. Again th ecompiler can detect errors, in this  case, when a class does not define a necessary method of the API.
+
+Cons:
+  For implementation inheritance, because the code implementing a sub-class is spread between the base and the sub-class, it can be more difficult to understand an implementation. The sub-class cannot override functions that are not virtual, so the sub-class cannot change implementation. The base class may also define some data members, so that specifies phyical layout of the base class.
+
+Decision:
+  All inheritance should be ``public``. If you want to do ``private`` inheritance, you should be including an instance of the base class as a member instead.
+
+  Do not overuse implementation inheritance. Composition is often more appropriate. Try to restrict usse of inheritance to the "is-a" case: ``Bar`` subclasses ``Foo`` if it can reasonably be said that ``Bar`` "is a kind of" ``Foo``.
+
+  Make your destructor ``virtual`` if necessary. If your class has ``virtual`` methods, itd destructor should be ``virtual``.
+
+  Limit the use of ``protected`` to those member functions that might need to be accessed from subclasses. Not that `Data Members Should Be Private`_.
+
+  Explicitly annotate overrides of virtual functions or virtual destructors with an override or (less frequently) final specifier. Older (pre-C++11) code will ue the ``virtual`` keyword as an inferior alternative annotation. For clarity, use exactly one of ``override``, ``final``, or ``virtual`` when declaring an override. Rational: A function or destructor marked override or final that isnot an override of a base class virtual function will not compile, and this helps catch common errors. THe specifiers serve as documentation; if no specifier is present, the reader has to check all ancestors of the class in question to tdetermin if the function or destructor is virtual or not.
 
 Multiple Inheritance
 ====================
 
+Only very rarely is multiple implementation inheritance actually useful. We allow multiple inheritance only when at most one of the base classes has an implementation; all other base classes must be `Pure Interface`_ classes tagged with the ``Interface`` suffix.
+
+Definition:
+  Multiple inheritance allows a sub-class to have more than one base class. We distinguish between base classes that are *pure interfaces* and those that have *implementation*.
+
+Pros:
+  Multiple implementation inheritance may let you re-use even more code than single inheritance (see `Inheritance`_).
+
+Cons:
+  Only very rarely is multiple *implementation* inheritance actually useful. When multiple implementation inheritance seems like the solution, you can usually find a different, more explicit, and cleaner solution.
+
+Decision:
+  Muliple inheritance is allowed only when all superclasses, with the possible exception of the first one, are `Pure Interfaces`_. In order to ensure that they remain pure interfaces, they must end with the ``Interface`` suffix.
+
 Interfaces
 ==========
+
+Classes taht satisfy certain conditions are allowed, but not required, to end with the ``Interface`` suffix.
+
+Definition:
+  A class is a pure interface if it meets the following requirements:
+  
+  - It has only public pure virtual ("= 0") methods and static methods (but see below for destructor).
+  - It may not have non-static data members.
+  - It needs not have any constructors defined. If a constructor is provided, it must take no arguments and must be protected.
+  - If it is a subclass, it may only be derived from classes that satisfy these conditions and are tagged with the ``Interface`` suffix.
+
+  An interface class can never be directly instantiated because of the pure virtual method(s) it declares. To make sure all implementations of the interface can be destroyed correctly, the interface must also declare a virtual destructor (in an exception to the first rule, this dhouls not be pure).
+
+Pros:
+  Tagging a class with the ``Interface`` suffix lets other know that they must not add implemented methods or non static data members. This is particularly important in the case of `Multiple Inheritance`_. Additionally, the interface concept is already well-understood by Java programmers.
+
+Cons:
+  The ``Interface`` suffix lengthens the class name, which can make it harder to read and understand. Also, ther interface property may be considered an implementation detail that shouldn't be exposed to clients.
+
+Decision:
+  A class may end with ``Interface`` only if it meets that aboce requierments. We do not require the converse, however: classes that meet the above requirements are not required to end with ``Interface``.
 
 Operator Overloading
 ====================
 
+Overload operators judiciously. Do not create user-defined literals.
+
+Definition:
+  C__ permits user code to `Declare Overloaded Versions of the Build-in Operators`_ using the ``operator`` keyword, so long as one of the parameters is a user-defined type. the ``operator`` keyword also permits user code to define new kinds of literals using ``operator" "``, and to define type-conversion funcitons such as ``operator bool()``.
+
+Pros:
+  Operator overloading can make code more concise and intuitaive by enabling user-defined types to behave the same as built-in types. Overloading operators are the idiomatic names for certain operations (e.g. ``==``, ``<`` , ``=``, and ``<<``), and adhering to those conventions can make user-defined types more readable and enable them to interoperate with libraries that expect those names.
+
+  User-defined literals are a vary concise notation for creating objects of user-defined types.
+
+Cons:
+  - Providing a correct, consistent, and unsurprising set of operator overloads requires some care, and failure to do so can lead to confusion and bugs.
+  - Overuse of operators can lead to obfuscated code, particularly if the overloaded operator's semantics don't follow convention.
+  - The hazards of function overloading apply just as mutch to operator overloading, if not more so.
+  - Operator overloads can fool our intuition into thinking that expensive operations are cheap, built-in operations.
+  - Finding the call sites for overloaded operators may require a search tool that's aware of C++ syntacx, reather than e.g. grep.
+  - If you get the argument type of an overloaded operator wrong, you may get a different overload rather than a compiler error. For ecample, ``foo < bar`` may do one thing, while ``&foo < &bar`` does something totally different.
+  - Certain operator overloads are inherently hazardous. Overloading unary & can cause the same code to have different meanings depending on whether the overload declaration is visible. Overloads of ``&&``, ``||``, and ``,`` cannot match the evaluation-order semantics of the built-in operators.
+  - Operators are often defined outside the class, so there's a risk of different files introducing different definitions of the same operator. If both definitions are linked inot the same binary, this result is undefined behavior, which can manifest as subtle run-time bugs.
+  - User-defined literals allow the creation of new syntactic forms that are unfamiliar even to experienced C++ programmers.
+
+Decision:
+  Define overloaded operators only if their meaning is obvious, unsurprising, nad consistent with the corresponding built-in operators. For example, use ``|`` as a bitwise- or logical-or, not as a shell-style pipe.
+
+  Define operators only on your own types. More precisely define them in the same headers, ``.cpp`` files, and namespaces as the types they operate on. That way, the operators are available wherever the type is, minimizing the risk of multiple definitions. If possible, avoid defining operators as templates, because they must satisfy this rule for any possible template arguments. If you define an operator, also define any related operators that make sense, and make sure they are defined consistently. For example, if you overload ``<``, overload all the comparison operators, and make sure ``<`` and ``>`` never return ``true`` for the same arguments.
+
+  Prefer to define non-modifying binary operators as non-member functions. If a binary operator is defined as a class member, implicit conversions will apply to the right-hand argument, but not the left one. It wil confuse your users if ``a < b`` compiels bu ``b < a`` doesn't.
+
+  Don't go out of your way to avoid defining operator overloads. For example, preer to define ``==``, ``=``, and ``<<``, rather than ``Equals()``, ``CopyFrom()``, and ``PrintTo()``. Conversely, don't define operator overloads just because other libraries expect them. FOr example, if your type doensn't have a natural ordering, but you want to store it in a ``std::set``, use a custom comparator rather than overloading ``<``.
+
+  Do not overload ``&&``, ``||``, ``,``, or unary ``&``. Do not overload ``operator" "``, i.e. do not introduce user-defined literals.
+
+  Type conversion operators are covered in the section on `Implicit Conversions`_. The ``=`` operator is covered in the section on `Copy Constructors`_. Overloading ``<<`` for use with streams is convered in the section on `Streams`_. See also the rules on `Function Overloading`_, which apply to operator overloading as well.
+
 Access Control
 ==============
 
+Make data members ``private`` unless they are ``static const`` (and follow the `Naming Convention for Constants`_). FOr technical reasons, we allow data members of a test fixture class to be ``protected`` when using `Google Test`_.
+
 Declaration Order
 =================
+
+Group similar declarations together, placing public parts earlier.
+
+A class definition should usually start with a ``public:`` section, followed by ``protected:``, then ``private:``. Omit sections that would be empty.
+
+Within each section, generally prefer grouping similar kinds of declarations together, and generally prefer the following order: types (including ``typedef``, ``using``, and nested structs and classes), constants, factory functions, constructors, assignment operators, destructor, all other methods, data members.
+
+Do not put large method definitions inline in the class definition. Usually, only trivial or preformance-critical, and very short, methods may be defined inline. See `Inline Functions`_ for more details.

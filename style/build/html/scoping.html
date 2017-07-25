@@ -182,7 +182,7 @@
 <p class="last">Inline namespaces automatically place their names in the enclosing scope. Consider the following snippet, for example:</p>
 </dd>
 </dl>
-<div class="highlight-c++"><div class="highlight"><pre><span class="k">namespace</span> <span class="n">X</span> <span class="p">{</span>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">namespace</span> <span class="n">X</span> <span class="p">{</span>
   <span class="kr">inline</span> <span class="k">namespace</span> <span class="n">Y</span> <span class="p">{</span>
     <span class="kt">void</span> <span class="n">foo</span><span class="p">();</span>
   <span class="p">}</span> <span class="c1">// namespace Y</span>
@@ -205,7 +205,7 @@
 </ul>
 </dd>
 </dl>
-<div class="highlight-c++"><div class="highlight"><pre><span class="c1">// In the .hpp file</span>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="c1">// In the .hpp file</span>
 <span class="k">namespace</span> <span class="n">mynamespace</span> <span class="p">{</span>
 
   <span class="c1">// All declarations are within the namespace scope.</span>
@@ -218,7 +218,7 @@
 <span class="p">}</span> <span class="c1">// namespace mynamespace</span>
 </pre></div>
 </div>
-<div class="highlight-c++"><div class="highlight"><pre><span class="c1">// In the .cpp file</span>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="c1">// In the .cpp file</span>
 <span class="k">namespace</span> <span class="n">mynamespace</span> <span class="p">{</span>
 
   <span class="c1">//Definition of functions in within scope of the namespace.</span>
@@ -236,18 +236,18 @@
 <li>You may not use a <em>using-directive</em> to make all names form a namespace available.</li>
 </ul>
 </div></blockquote>
-<div class="highlight-c++"><div class="highlight"><pre><span class="c1">// Forbidden -- This pollutes the namespace.</span>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="c1">// Forbidden -- This pollutes the namespace.</span>
 <span class="k">using</span> <span class="k">namespace</span> <span class="n">foo</span><span class="p">;</span>
 </pre></div>
 </div>
 <ul class="simple">
 <li>Do not use <em>Namespace aliases</em> at namespace scope in header files except in explicitly marked internal-only namespace, because anything imported into a namespace in a header file becomes part of the public API exported by that file</li>
 </ul>
-<div class="highlight-c++"><div class="highlight"><pre><span class="c1">// Shorten access to some commonly used names in .cpp files.</span>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="c1">// Shorten access to some commonly used names in .cpp files.</span>
 <span class="k">namespace</span> <span class="n">bax</span> <span class="o">=</span> <span class="o">::</span><span class="n">foo</span><span class="o">::</span><span class="n">bar</span><span class="o">::</span><span class="n">baz</span><span class="p">;</span>
 </pre></div>
 </div>
-<div class="highlight-c++"><div class="highlight"><pre><span class="c1">// Shorten access to some commonly used names (in a .hpp file).</span>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="c1">// Shorten access to some commonly used names (in a .hpp file).</span>
 <span class="k">namespace</span> <span class="n">librarian</span> <span class="p">{</span>
   <span class="k">namespace</span> <span class="n">impl</span> <span class="p">{</span> <span class="c1">// Internal, not part of the API.</span>
     <span class="k">namespace</span> <span class="n">sidetable</span> <span class="o">=</span> <span class="o">::</span><span class="n">pipline_diagnostics</span><span class="o">::</span><span class="n">sidetable</span><span class="p">;</span>
@@ -276,7 +276,7 @@
 <p class="last">Format unnamed namespace like named namespace in the terminating comment, leave the namespace name empty:</p>
 </dd>
 </dl>
-<div class="highlight-c++"><div class="highlight"><pre><span class="k">namespace</span> <span class="p">{</span>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">namespace</span> <span class="p">{</span>
   <span class="p">...</span>
 <span class="p">}</span> <span class="c1">// namespace</span>
 </pre></div>
@@ -293,7 +293,7 @@
 <dt>Decision:</dt>
 <dd>Sometimes it is useful to define a function not bound to a class instance. Such a function can be either a static member of a nonmember function. Nonmember functions should not depend on external variables, and should nearly always exist in a namespace. Rather than creating classes only to group static member functions which do not share static data, use <a class="reference internal" href="#namespaces">Namespaces</a> instead. For a header <code class="docutils literal"><span class="pre">myproject/foo_bar.h</span></code>, for example, write</dd>
 </dl>
-<div class="highlight-c++"><div class="highlight"><pre><span class="k">namespace</span> <span class="n">myproject</span> <span class="p">{</span>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">namespace</span> <span class="n">myproject</span> <span class="p">{</span>
   <span class="k">namespace</span> <span class="n">foo_bar</span> <span class="p">{</span>
     <span class="kt">void</span> <span class="n">Function1</span><span class="p">();</span>
     <span class="kt">void</span> <span class="nf">Function2</span><span class="p">();</span>
@@ -302,7 +302,7 @@
 </pre></div>
 </div>
 <p>instead of</p>
-<div class="highlight-c++"><div class="highlight"><pre><span class="k">namespace</span> <span class="n">myproject</span> <span class="p">{</span>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">namespace</span> <span class="n">myproject</span> <span class="p">{</span>
   <span class="k">class</span> <span class="nc">FooBar</span> <span class="p">{</span>
    <span class="k">public</span><span class="o">:</span>
     <span class="k">static</span> <span class="kt">void</span> <span class="n">Function1</span><span class="p">();</span>
@@ -317,27 +317,27 @@
 <h2>Local Variables<a class="headerlink" href="#local-variables" title="Permalink to this headline">¶</a></h2>
 <p>Place a function’s variables in the narrowest scope possible, and initialize variables in the declaration.</p>
 <p>C++ allows you to declare variables anywhere in a function. We encourage you to declare them in as local a scope as possible, and as close to the first use as possible. This makes it easier for the reader to find the declaration and see what type the variable is and what it was initialized to. In particular, initialization should be used instead of declaration and assignment, e.g.:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
 <span class="n">i</span> <span class="o">=</span> <span class="n">f</span><span class="p">();</span> <span class="c1">// Bad -- initialization separate from declaration.</span>
 </pre></div>
 </div>
-<div class="highlight-c++"><div class="highlight"><pre><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">g</span><span class="p">()</span> <span class="c1">// Good -- declaration has initialization.</span>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="n">g</span><span class="p">()</span> <span class="c1">// Good -- declaration has initialization.</span>
 </pre></div>
 </div>
-<div class="highlight-c++"><div class="highlight"><pre><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">v</span><span class="p">;</span>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">v</span><span class="p">;</span>
 <span class="n">v</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// Prefer initializing using brace initialization.</span>
 <span class="n">v</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
 </pre></div>
 </div>
-<div class="highlight-c++"><div class="highlight"><pre><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">v</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">};</span> <span class="c1">// Good -- v starts initialized.</span>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">v</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">};</span> <span class="c1">// Good -- v starts initialized.</span>
 </pre></div>
 </div>
 <p>Variables needed for <code class="docutils literal"><span class="pre">if</span></code>, <code class="docutils literal"><span class="pre">while</span></code>, and <code class="docutils literal"><span class="pre">for</span></code> statements should normally be declared within those statements, so that such variables are confined to those scopes. E.g.:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span class="k">while</span> <span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">p</span> <span class="o">=</span> <span class="n">strchr</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="sc">&#39;/&#39;</span><span class="p">))</span> <span class="n">str</span> <span class="o">=</span> <span class="n">p</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">while</span> <span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">p</span> <span class="o">=</span> <span class="n">strchr</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="sc">&#39;/&#39;</span><span class="p">))</span> <span class="n">str</span> <span class="o">=</span> <span class="n">p</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
 </pre></div>
 </div>
 <p>There is one caveat: if the variable is an object, its constructor is invoked every time it enters scope and is created, and its destructor is invoked every time it goes out of scope.</p>
-<div class="highlight-c++"><div class="highlight"><pre><span class="c1">// Inefficient implementation:</span>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="c1">// Inefficient implementation:</span>
 <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">1000000</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
   <span class="n">Foo</span> <span class="n">f</span><span class="p">;</span> <span class="c1">// My ctor and dtor get called 1000000 times each.</span>
   <span class="n">f</span><span class="p">.</span><span class="n">DoSomething</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
@@ -345,7 +345,7 @@
 </pre></div>
 </div>
 <p>It may be more efficient to declare such a variable used in a loop outside that loop:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span class="n">Foo</span> <span class="n">f</span><span class="p">;</span> <span class="c1">// My ctor and dtor get called once each.</span>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">Foo</span> <span class="n">f</span><span class="p">;</span> <span class="c1">// My ctor and dtor get called once each.</span>
 <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">1000000</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
   <span class="n">f</span><span class="p">.</span><span class="n">DoSOmething</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
 <span class="p">}</span>

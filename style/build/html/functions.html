@@ -173,21 +173,115 @@
 <h1>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="parameter-ordering">
 <h2>Parameter Ordering<a class="headerlink" href="#parameter-ordering" title="Permalink to this headline">¶</a></h2>
+<p>When defining a funciton, parameter order is: inputs, then output.</p>
+<p>Parameters to C/C++ functions are either input to the funciton, outpput form the function, or both. Input parameters are usually values or <code class="docutils literal"><span class="pre">const</span></code> references, while output and input/output parameters will be pointes to non-<code class="docutils literal"><span class="pre">const</span></code>. When ordering function parameters, put all input-only parameters before any output parameters. In particular, do not add noew parameters to the end of the function just because they are new; place new input-only parameters before the output parameters.</p>
+<p>This is not a hard-and-fast rule. Parameters that are both input and output (often classes/structs) muddy the waters, and, as always, consistency with related function may require you to bend the rule.</p>
 </div>
 <div class="section" id="write-short-functions">
 <h2>Write Short Functions<a class="headerlink" href="#write-short-functions" title="Permalink to this headline">¶</a></h2>
+<p>Prefer small and focused functions.</p>
+<p>We recognize that long funcitons are somethimes appropriate, so no hard limit is placed on functions length. If a function exceeds about 40 lines, think about whether it can be broken up without harming the structure of the program.</p>
+<p>Even if your long function works perfectly now, someone modifying it in a few months may add new behavior. This could result in bugs that are hard to find. Keeping your functions short and simple makes it easier for other people to read and modify your code.</p>
+<p>You could find long and complicated functions when working with some code. DO not be intimidated by modifying existing code: if workin with such a function provides to be difficult, you find that erros are hard to debug, or you want to use a piece of it in several different contexts, consider breaking up the function into smaller and more manageable pieces.</p>
 </div>
 <div class="section" id="reference-arguments">
 <h2>Reference Arguments<a class="headerlink" href="#reference-arguments" title="Permalink to this headline">¶</a></h2>
+<p>All parameters passed by reference must be labeled <code class="docutils literal"><span class="pre">const</span></code>.</p>
+<dl class="docutils">
+<dt>Definition:</dt>
+<dd>In C, if a funciton needs to modify a variable, the parameter must use a pointer, e.g. <code class="docutils literal"><span class="pre">int</span> <span class="pre">foo(int</span> <span class="pre">*pval)</span></code>. In C++, the function can alternatively declare a reference parameter: <code class="docutils literal"><span class="pre">int</span> <span class="pre">foo(int</span> <span class="pre">&amp;val)</span></code>.</dd>
+<dt>Pros:</dt>
+<dd>Defining a parameter as reference avoids ugly code like <code class="docutils literal"><span class="pre">(*pval)++</span></code>. Necessary for some applicaitons like copy constructors. Makes it clear, unlike with pointers, that a null pointer is not a possible value.</dd>
+<dt>Cons:</dt>
+<dd>References can be confusing, as they have value syntax but pointer semantics.</dd>
+<dt>Decision:</dt>
+<dd>WIthin function parameter lists all references must be <code class="docutils literal"><span class="pre">const</span></code>:</dd>
+</dl>
+<div class="highlight-c++"><div class="highlight"><pre><span></span>void Foo(const string &amp;in, string \*out);
+</pre></div>
+</div>
+<p>In fact it is a very strong convention in Google code that input arguments are values or <code class="docutils literal"><span class="pre">const</span></code> references while output areguments are pointers. INput parameters may be <code class="docutils literal"><span class="pre">const</span></code> pointers, but we never allow non-<code class="docutils literal"><span class="pre">const</span></code> refernce parameters except when required by convention, e.g., <code class="docutils literal"><span class="pre">swap()</span></code>.</p>
+<p>However, there are some instances where using <code class="docutils literal"><span class="pre">const</span> <span class="pre">T*</span></code> is perferable to <code class="docutils literal"><span class="pre">const</span> <span class="pre">T&amp;</span></code> for input parameters. For example:
+- You want to pass in a null pointer.
+- The function saves a pointer or reference to the input.</p>
+<p>Remember that most of the time input parameters are going to be specified as <code class="docutils literal"><span class="pre">const</span> <span class="pre">T&amp;</span></code> using <code class="docutils literal"><span class="pre">const</span> <span class="pre">T*</span></code> instead communicates to the reader that the input is somehow treated differently. So if you choose <code class="docutils literal"><span class="pre">const</span> <span class="pre">T*</span></code> rather than <code class="docutils literal"><span class="pre">const</span> <span class="pre">T&amp;</span></code>, do so for a concrete reason; otherwise it will likely confuse readers by making them look for an explanation that doesn’t exist.</p>
 </div>
 <div class="section" id="function-overloading">
 <h2>Function Overloading<a class="headerlink" href="#function-overloading" title="Permalink to this headline">¶</a></h2>
+<p>Use overloaded functions (including constructors) only if a reader looking at a call site can get a good idea of what is happening without having to first figure out exactly which overload is being called.</p>
+<dl class="docutils">
+<dt>Definition:</dt>
+<dd>You may write a funciton that takes a <code class="docutils literal"><span class="pre">const</span> <span class="pre">string&amp;</span></code> and overload it with another that takes <code class="docutils literal"><span class="pre">const</span> <span class="pre">char*</span></code>.</dd>
+</dl>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyClass</span> <span class="p">{</span>
+ <span class="k">public</span><span class="o">:</span>
+  <span class="kt">void</span> <span class="n">Analyze</span><span class="p">(</span><span class="k">const</span> <span class="n">string</span> <span class="o">&amp;</span><span class="n">text</span><span class="p">);</span>
+  <span class="kt">void</span> <span class="nf">Analyze</span><span class="p">(</span><span class="k">const</span> <span class="n">car</span><span class="o">*</span><span class="n">text</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">textleng</span><span class="p">);</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>Pros:</dt>
+<dd>Overloading can make code more intuitive by allowing an identically-named funciton to take different arguments. It may be necessary for templatized code, and it can be convenient for Visitors.</dd>
+<dt>Cons:</dt>
+<dd>If a funciton is overloaded by the argument types alone, a reader may have to understand C++’s complex matching rules in order to tell what’s going on. Also many people are confused by the semantics of inheritance if a derived class overides only some of the variants of a funciton.</dd>
+<dt>Decision:</dt>
+<dd>If you want to overlad a funciton, consider qualifying th ename with some informaiton about the arguments, e.g., <code class="docutils literal"><span class="pre">AppendString()</span></code>, <code class="docutils literal"><span class="pre">AppendInt()</span></code> rather than just <code class="docutils literal"><span class="pre">Append()</span></code>. If you are overloading a function to support variable number of arguments of the same type, consider making it take a <code class="docutils literal"><span class="pre">std::vector</span></code> so that the use can use an <a href="#id1"><span class="problematic" id="id2">`Initializer List`_</span></a> to specify the arguments.</dd>
+</dl>
 </div>
 <div class="section" id="default-arguments">
 <h2>Default Arguments<a class="headerlink" href="#default-arguments" title="Permalink to this headline">¶</a></h2>
+<p>Default arguments are allowed on non-virtual functions when the default is guaranteed to always have the same value. Follow the same restrictions as for <a class="reference internal" href="#function-overloading">Function Overloading</a>, and prefer overloaded functions if the readability gained with the default arguments doesn’t outweigh the downsides below.</p>
+<dl class="docutils">
+<dt>Pros:</dt>
+<dd>Often you have a funciton that uses default values, but occasionally you want to override the defaults. Default parameters allow an easy way to do this without having to define many funcitons for the rare exceptions. COmpared to overloading the funciton, default arguments have a cleaner syntax, with less boilerplate and a clearer distinction between ‘required’ and ‘optional’ arguments.</dd>
+<dt>Cons:</dt>
+<dd><p class="first">Defaulted arguments are another way to achieve the semantics of overloaded functions, so all the <a href="#id3"><span class="problematic" id="id4">`Reasons not to overload functions`_</span></a> apply.</p>
+<p>THe default for arguemnts in a virtual funciton call are determined by the static type fo the target object and there’s no guarantee that all overrides of a given function declare the same default.</p>
+<p>Default parameters are re-evaluated at each call site, which can bloat the generated code. Readers may also expect the default’s value to be fixed at the declaration instead of varying at each call.</p>
+<p class="last">Funciton pointers are confusing in the presence of default arguments, since the funciton signature often doesn’t match the call signature. Adding function overloads avoid these problems.</p>
+</dd>
+<dt>Decision:</dt>
+<dd><p class="first">Default arguments are banned on virtual funcitons, where they don’t work properly, and in cases where the specified default might not evaluate to the same value depending on when it was evaluated. (For example, don’t write <code class="docutils literal"><span class="pre">void</span> <span class="pre">f(int</span> <span class="pre">n</span> <span class="pre">=</span> <span class="pre">counter++);</span></code>.)</p>
+<p class="last">In some other cases, default arguments can imporve the readability of their function declarations enought to overcome the downsides about, so they are allowed. When in doubt, use overloads.</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="trailing-return-type-syntax">
 <h2>Trailing Return Type Syntax<a class="headerlink" href="#trailing-return-type-syntax" title="Permalink to this headline">¶</a></h2>
+<p>Use trailing return types only where using th eordinary syntax (leading return types) is impractical or much less readable.</p>
+<dl class="docutils">
+<dt>Definitions:</dt>
+<dd>C++ allows two different forms of function declarations. In ht older form, the return type appears before the funciton name. For example:</dd>
+</dl>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="nf">foo</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The new form, introduced in C++11, uses the auto keyword before the function name and a trailing return type after the argument list. FOr example, the declaration above could equivalently be written:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">auto</span> <span class="nf">foo</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">int</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The trailing return type is in the funciton’s scope. THis doesn’t make a difference for a simple case like <code class="docutils literal"><span class="pre">int</span></code> but in matters for more complicated cases, like types declared in calss scope or types wirtten in terms of the function parameters.</p>
+<dl class="docutils">
+<dt>Pros:</dt>
+<dd><p class="first">Trailing return types are the only wat to explicitly specify the return type of a <a href="#id5"><span class="problematic" id="id6">`Lambda expression`_</span></a>. In some cases the ecompiler is able to deduce a lambda’s return type, but not in all cases. Even when the compiler can deduce it automatically, sometimes specifying it explicitly would be clearer for readers.</p>
+<p class="last">Sometimes it’s easier and more readable to specify a return type after the funciton’s parameter list has already appeared. This si particularly true when the retrun type depends on template parameters. For example:</p>
+</dd>
+</dl>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="p">,</span> <span class="k">class</span> <span class="nc">U</span><span class="o">&gt;</span> <span class="k">auto</span> <span class="n">add</span><span class="p">(</span><span class="n">T</span> <span class="n">t</span><span class="p">,</span> <span class="n">U</span> <span class="n">u</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="k">decltype</span><span class="p">(</span><span class="n">t</span> <span class="o">+</span> <span class="n">u</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>versus</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="p">,</span> <span class="k">class</span> <span class="nc">Y</span><span class="o">&gt;</span> <span class="k">decltype</span><span class="p">(</span><span class="n">declval</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&amp;&gt;</span><span class="p">()</span> <span class="o">+</span> <span class="n">declval</span><span class="o">&lt;</span><span class="n">U</span><span class="o">&amp;&gt;</span><span class="p">())</span> <span class="n">add</span><span class="p">(</span><span class="n">T</span> <span class="n">t</span><span class="p">,</span> <span class="n">U</span> <span class="n">u</span><span class="p">);</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>Cons:</dt>
+<dd><p class="first">Trailing return type syntax is relatively new and it has no analoge in C++-like languages like C and Java, so some readers may find it unfamiliar.</p>
+<p class="last">Existing code bases have an enormous number of function declarations that aren’t going to get changed to use the new syntax, so the realistic choices are using the only syntax only or using a mixture of the two. Using a single version is better for uniformity of style.</p>
+</dd>
+<dt>Decision:</dt>
+<dd>In most cases, continue to use the older style of function declaration where the return type goes before the function name. Use the new trailing-return-type form only in cases where it’s required (such as lambdas) or where, by putting the type after the function’s  parameter list, it allows you to write the type in a much more readable way. The latter case should be rare; it’s mostly an issue in fairly complicated template code, which is <a href="#id7"><span class="problematic" id="id8">`discouraged in most cases`_</span></a>.</dd>
+</dl>
 </div>
 </div>
 

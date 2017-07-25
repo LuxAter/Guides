@@ -101,13 +101,17 @@
 <li class="toctree-l2"><a class="reference internal" href="#general-naming-rules">General Naming Rules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#file-names">File Names</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#type-names">Type Names</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#variable-names">Variable Names</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#variable-names">Variable Names</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#common-variable-names">Common Variable Names</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#class-data-members">Class Data Members</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#struct-data-members">Struct Data Members</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#constant-names">Constant Names</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#function-names">Function Names</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#namespace-names">Namespace Names</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#enumerator-names">Enumerator Names</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#macro-names">Macro Names</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#exceptions-to-naming-rules">Exceptions to Naming Rules</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="comments.html">Comments</a></li>
@@ -175,35 +179,159 @@
             
   <div class="section" id="naming">
 <h1>Naming<a class="headerlink" href="#naming" title="Permalink to this headline">¶</a></h1>
+<p>The most important consistency rule are those that govern naming. Tye style of a name immediately informs us what sort of thing the name entity is: a type, a variable, a function, a constant, a macro, etc., without requiring us to search for the declaration of that entity. The pattern-matching engine in our brains relies a great deal on these naming rules.</p>
+<p>Nameing rules are pretty arbitrary, but we feel that consistency is more important than individual preferences in this area, so regardless of whether you find them sensible or not, the rules are the rules.</p>
 <div class="section" id="general-naming-rules">
 <h2>General Naming Rules<a class="headerlink" href="#general-naming-rules" title="Permalink to this headline">¶</a></h2>
+<p>Names should be descriptive; avoid abbreviation.</p>
+<p>Give as descriptive a name as possible, within reason. Do not worry about saving horizontal space as it is far more important to make your code immediately understandable by a new reader. Do not use abbreviations that are ambiguous or unfamiliar to readers outside you project, and do not abbreviate by deleting letters within a word.</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="n">price_count_reader</span><span class="p">;</span> <span class="c1">// No abbreviation.</span>
+<span class="kt">int</span> <span class="nl">num_errors</span><span class="p">:</span> <span class="c1">// &quot;num&quot; is a widespread convention.</span>
+<span class="kt">int</span> <span class="n">num_dns_connections</span><span class="p">;</span> <span class="c1">// Most people know what &quot;DNS&quot; stands for.</span>
+</pre></div>
+</div>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="n">n</span><span class="p">;</span> <span class="c1">// Meaningless.</span>
+<span class="kt">int</span> <span class="n">nerr</span><span class="p">;</span> <span class="c1">// Ambiguous abbreviations.</span>
+<span class="kt">int</span> <span class="n">n_comp_conns</span><span class="p">;</span> <span class="c1">// Ambiguous abbreviaiton.</span>
+<span class="kt">int</span> <span class="n">wgc_connections</span><span class="p">;</span> <span class="c1">// Only your group knows what this stands for.</span>
+<span class="kt">int</span> <span class="n">pc_reader</span><span class="p">;</span> <span class="c1">// Lots of things can be abbreviated &quot;pc&quot;.</span>
+<span class="kt">int</span> <span class="n">cstmr_id</span><span class="p">;</span> <span class="c1">// Deletes internal letters.</span>
+</pre></div>
+</div>
+<p>Not that certain universally-known abbreviaitons are OK, such as <code class="docutils literal"><span class="pre">i</span></code> for an iteration variable and <code class="docutils literal"><span class="pre">T</span></code> for template parameter.</p>
+<p>Template parameters should follow the naming style for their category: type template parameters should follow the rules for <a class="reference internal" href="#type-names">Type Names</a>, and non-type template parameters should follow the rules for <a class="reference internal" href="#variable-names">Variable Names</a>.</p>
 </div>
 <div class="section" id="file-names">
 <h2>File Names<a class="headerlink" href="#file-names" title="Permalink to this headline">¶</a></h2>
+<p>Filenames should be all lowercase and can include underscores (<code class="docutils literal"><span class="pre">_</span></code>) or dashes (<code class="docutils literal"><span class="pre">-</span></code>). Follow the convention that your project uses. If there is no consistent local pattern to follow, perfer “<code class="docutils literal"><span class="pre">_</span></code>”.</p>
+<dl class="docutils">
+<dt>Examples of acceptable file names:</dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal"><span class="pre">my_useful_class.cpp</span></code></li>
+<li><code class="docutils literal"><span class="pre">my-useful-class.cpp</span></code></li>
+<li><code class="docutils literal"><span class="pre">myusefulclass.cpp</span></code></li>
+<li><code class="docutils literal"><span class="pre">myusefulclass_test.cpp</span></code></li>
+</ul>
+</dd>
+</dl>
+<p>C++ files shoudl end in <code class="docutils literal"><span class="pre">.cpp</span></code> and header files should end in <code class="docutils literal"><span class="pre">.hpp</span></code>. Files that rely on being textually included at specific points should end in <code class="docutils literal"><span class="pre">.inc</span></code> (see also the seciton on <a href="#id1"><span class="problematic" id="id2">`self-contained headers`_</span></a>).</p>
+<p>Do not use filenames that aready exist in <code class="docutils literal"><span class="pre">/usr/include</span></code>, such as <code class="docutils literal"><span class="pre">db.h</span></code>.</p>
+<p>In general, make your filenames very specific. For example, use <code class="docutils literal"><span class="pre">http_server_logs.hpp</span></code> rather than <code class="docutils literal"><span class="pre">logs.hpp</span></code>. A very common case is to have a pair of files called, e.g., <code class="docutils literal"><span class="pre">foo_bar.hpp</span></code> and <code class="docutils literal"><span class="pre">foo_bar.cpp</span></code>, defining a class called <code class="docutils literal"><span class="pre">FooBar</span></code>.</p>
+<p>Inline functions must be in a <code class="docutils literal"><span class="pre">.cpp</span></code> file. In your inline funcitons are very short, they should go directly into your <code class="docutils literal"><span class="pre">.hpp</span></code> file.</p>
 </div>
 <div class="section" id="type-names">
 <h2>Type Names<a class="headerlink" href="#type-names" title="Permalink to this headline">¶</a></h2>
+<p>Type names start witha  capital letter and have a capital letter for each new word, with no underscores: <code class="docutils literal"><span class="pre">MyExcitingClass</span></code>, <code class="docutils literal"><span class="pre">MyExcitingEnum</span></code>.</p>
+<p>The names of all types – classes, structs, types aliases, enums, and type template parameters – have the same naming convention. TYpe names should start with a capital letter and have a capital letter for each new word. No underscores. For example:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span>// classes and structs
+class UrlTable { ...
+UrlTableTester { ...
+struct UrlTableProperties { ...
+
+// typedefs
+typedef hash_map&lt;UrlTableProperties \*, string&gt; PropertiesMap;
+
+// using aliases
+using PropertiesMap = hash_map&lt;UrlTableProperties \*, string&gt;;
+
+// enums
+enum UrlTableErros { ...
+</pre></div>
+</div>
 </div>
 <div class="section" id="variable-names">
 <h2>Variable Names<a class="headerlink" href="#variable-names" title="Permalink to this headline">¶</a></h2>
+<p>The names of variables (including function parameters) and data members are all lower case, with underscores between words. Data members of classes (but not structs) additionally have trailing underscores. For instance: <code class="docutils literal"><span class="pre">a_local_variable</span></code>, <code class="docutils literal"><span class="pre">a_struct_data_member</span></code>, <code class="docutils literal"><span class="pre">a_class_data_member_</span></code>.</p>
+<div class="section" id="common-variable-names">
+<h3>Common Variable Names<a class="headerlink" href="#common-variable-names" title="Permalink to this headline">¶</a></h3>
+<p>For example:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">string</span> <span class="n">table_name</span><span class="p">;</span> <span class="c1">// OK - uses underscore.</span>
+<span class="n">string</span> <span class="n">tablename</span><span class="p">;</span> <span class="c1">// OK - all lowercase.</span>
+</pre></div>
+</div>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">string</span> <span class="n">tableName</span><span class="p">;</span> <span class="c1">// Bad - mixed case.</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="class-data-members">
+<h3>Class Data Members<a class="headerlink" href="#class-data-members" title="Permalink to this headline">¶</a></h3>
+<p>Data members of classes, both static and non-static, are named like ordinary nonmember variables, but with a trailing underscore.</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">TableInfo</span> <span class="p">{</span>
+  <span class="p">...</span>
+ <span class="k">private</span><span class="o">:</span>
+  <span class="n">string</span> <span class="n">table_name_</span><span class="p">;</span> <span class="c1">// OK - underscore at end.</span>
+  <span class="n">string</span> <span class="n">tablename_</span><span class="p">;</span> <span class="c1">// OK.</span>
+  <span class="k">static</span> <span class="n">Pool</span><span class="o">&lt;</span><span class="n">TableInfo</span><span class="o">&gt;*</span> <span class="n">pool_</span><span class="p">;</span> <span class="c1">// OK.</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="struct-data-members">
+<h3>Struct Data Members<a class="headerlink" href="#struct-data-members" title="Permalink to this headline">¶</a></h3>
+<p>Data members of structs, both static and non-static, are named like orindary nonmember variables. They do not have the trailing underscores that data members in classes have.</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">struct</span> <span class="n">UrlTableProperties</span> <span class="p">{</span>
+  <span class="n">string</span> <span class="n">name</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">num_entries</span><span class="p">;</span>
+  <span class="k">static</span> <span class="n">Pool</span><span class="o">&lt;</span><span class="n">UrlTableProperties</span><span class="o">&gt;*</span> <span class="n">pool</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="constant-names">
 <h2>Constant Names<a class="headerlink" href="#constant-names" title="Permalink to this headline">¶</a></h2>
+<p>Varialbes declare constexpr or const, and whose value is fixed for the duration of the program, are named with a leading “k” followed by mixed case. For example:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">const</span> <span class="kt">int</span> <span class="n">kDaysInAWeek</span> <span class="o">=</span> <span class="mi">7</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>All such variables with static storage duration (i.e. statics and globals, see <a href="#id3"><span class="problematic" id="id4">`Storage Duration`_</span></a> for details) should be named this way. This convention is optional for variables of other storage classes, e.g. automatic variables, otherwise the usual variable nameing rules apply.</p>
 </div>
 <div class="section" id="function-names">
 <h2>Function Names<a class="headerlink" href="#function-names" title="Permalink to this headline">¶</a></h2>
+<p>Regular funcitons have mixed case; accessors and mutators may be named like variables.</p>
+<p>Ordinarily, funcitons hsould start with a capital letter and ahve a capital letter for each new word (a.k.a. “<a href="#id5"><span class="problematic" id="id6">`Camel Case`_</span></a>” or “Pascal case”). Such names should not have underscores. Prefer to capitalize acronyms as single words (i.e. <code class="docutils literal"><span class="pre">StartRpc()</span></code>, not <code class="docutils literal"><span class="pre">StartRPC()</span></code>).</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">AddTableEntry</span><span class="p">()</span>
+<span class="n">DeleteUrl</span><span class="p">()</span>
+<span class="n">OpenFileOrDie</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>(The same naming rule applies to class- and namespace-scope constants that are exposed as part of an API and that are intended to look like funcitons, beacuse the fact that they’re objects rather than functions is an unimportant implemenation detail.)</p>
+<p>Accessors and mutators (<code class="docutils literal"><span class="pre">get</span></code> and <code class="docutils literal"><span class="pre">set</span></code> functions) may be named like variables. These often correspond to actual member variables, but this is not required for example, <code class="docutils literal"><span class="pre">int</span> <span class="pre">count()</span></code> and <code class="docutils literal"><span class="pre">void</span> <span class="pre">set_count(int</span> <span class="pre">count)</span></code>.</p>
 </div>
 <div class="section" id="namespace-names">
 <h2>Namespace Names<a class="headerlink" href="#namespace-names" title="Permalink to this headline">¶</a></h2>
+<p>Namespace names are all lower-case. Top-level names are based on the project name. Avoid collisions between nested namespaces and well-known top-level namespaces.</p>
+<p>The name of a top-level namespace should usually be the name of the project or team whose code is contained in that namespaces. The code in that namespace should usually be in a directory whose basename matches the namespace name (or subdirectories thereof).</p>
+<p>Keep in mind that the <a href="#id7"><span class="problematic" id="id8">`rule against abbreviated names`_</span></a> applies to namespaces just as much as variable names. Code inside the namespace seldom needs to mention the namespace name, so there’s usually no particular need for abbreviation anyway.</p>
+<p>Avoid nested namespaces that match well-nown top-level namespaces. Collisions between namespace names can lead to surprising build breaks beacuse of name lookup rules. In particular, do not create any nested <code class="docutils literal"><span class="pre">std</span></code> namespaces. Prefer unique project identifers (<code class="docutils literal"><span class="pre">websearch::index</span></code>, <code class="docutils literal"><span class="pre">websearch::index_util</span></code>) over collision-prone names like <code class="docutils literal"><span class="pre">websearch::util</span></code>.</p>
+<p>For internal namespaces, be wary of other code being added ot the same internal namespac causing a collision (internal helpers within a team tend to be related and may lead to collisions). In such a situation, using the filename to make a unique internal name is helpful (<code class="docutils literal"><span class="pre">websearch::index::frobber_internal</span></code> for use in <code class="docutils literal"><span class="pre">frobber.hpp</span></code>).</p>
 </div>
 <div class="section" id="enumerator-names">
 <h2>Enumerator Names<a class="headerlink" href="#enumerator-names" title="Permalink to this headline">¶</a></h2>
+<p>Enumerators (for both scoped and unscoped enums) should be named <em>either</em> like <a href="#id9"><span class="problematic" id="id10">`constants`_</span></a> or like <a href="#id11"><span class="problematic" id="id12">`macros`_</span></a>: either <code class="docutils literal"><span class="pre">kEnumName</span></code> or <code class="docutils literal"><span class="pre">ENUM_NAME</span></code>.</p>
+<p>Preferably, the individual enumerators should be named like <a href="#id13"><span class="problematic" id="id14">`constants`_</span></a>. However, it is also acceptable to name them like <a href="#id15"><span class="problematic" id="id16">`macros`_</span></a>. The enumeration name, <code class="docutils literal"><span class="pre">UrlTableErrors</span></code> (and <code class="docutils literal"><span class="pre">AlternateUrlTableErrors</span></code>), is a type, and therefore mixed case.</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">enum</span> <span class="n">UrlTableErrors</span> <span class="p">{</span>
+  <span class="n">kOK</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+  <span class="n">kErrorOutOfMemory</span><span class="p">,</span>
+  <span class="n">kErrorMalformedInput</span><span class="p">,</span>
+<span class="p">};</span>
+<span class="k">enum</span> <span class="n">AlternateUrlTableErrors</span> <span class="p">{</span>
+  <span class="n">OK</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+  <span class="n">OUT_OF_MEMORY</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="n">MALFORMED_INPUT</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>Until January 2009, the style was to name enum values like <a href="#id17"><span class="problematic" id="id18">`macros`_</span></a>. This caused problems with name collisions between enum values and macros. Hence, the change to prefer constant-style nameing was put in place. New code should prefer constant-style naming if possible. However, there is no reason to change old code to use constant-style names, unless the old names are actually causing a compile-time problem.</p>
 </div>
 <div class="section" id="macro-names">
 <h2>Macro Names<a class="headerlink" href="#macro-names" title="Permalink to this headline">¶</a></h2>
+<p>You’re not really going to <a href="#id19"><span class="problematic" id="id20">`define a macro`_</span></a>, are you? If you do, they’re like this: <code class="docutils literal"><span class="pre">MY_MACRO_THAT_SCARES_SMALL_CHILDREN</span></code>.</p>
+<p>Please see the <a href="#id21"><span class="problematic" id="id22">`description of macros`_</span></a>; in general macros should <em>not</em> be used. However, if they are absolutely needed, then they sould be named with capitals and underscores.</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cp">#define ROUND(x) ...</span>
+<span class="cp">#define PI_ROUNDED 3.0</span>
+</pre></div>
 </div>
-<div class="section" id="exceptions-to-naming-rules">
-<h2>Exceptions to Naming Rules<a class="headerlink" href="#exceptions-to-naming-rules" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 

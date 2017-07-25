@@ -210,7 +210,7 @@
 <p class="last">The <code class="docutils literal"><span class="pre">explicit</span></code> keyword can be applied to a constructor of (since C++11) a conversion operator, to ensure that it can only be used when the destination type is explicit at the point of use, e.g. with a cast. This applies not only for implicit conversion, but to C++11’s list initialization syntax:</p>
 </dd>
 </dl>
-<div class="highlight-c++"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Foo</span> <span class="p">{</span>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Foo</span> <span class="p">{</span>
   <span class="k">explicit</span> <span class="n">Foo</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">);</span>
   <span class="p">...</span>
 <span class="p">};</span>
@@ -268,7 +268,7 @@
 <p class="last">If your type provides copy operations, it is recommended that you design your class so that the default implementation of those operations is correct. Remember to review the correctness of any defaulted operations as you would any other code, and to document that your class is copyable and/or cheaply movable if that’s and API guarantee.</p>
 </dd>
 </dl>
-<div class="highlight-c++"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Foo</span> <span class="p">{</span>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Foo</span> <span class="p">{</span>
  <span class="k">public</span><span class="o">:</span>
   <span class="n">Foo</span><span class="p">(</span><span class="n">Foo</span><span class="o">&amp;&amp;</span> <span class="n">other</span><span class="p">)</span> <span class="o">:</span> <span class="n">field_</span><span class="p">(</span><span class="n">other</span><span class="p">.</span><span class="n">field</span><span class="p">)</span> <span class="p">{}</span>
   <span class="c1">// Bad, defines only move constructor, but not operator=.</span>
@@ -280,7 +280,7 @@
 </div>
 <p>Due to the risk of slicing, avoid providing an assignment operator or public copy/move constructor for a class that’s intended to be derived from (and avoid deriving form a class with such members). If your base class needs to be copyable, provide a public virtual <code class="docutils literal"><span class="pre">Clone()</span></code> method, and a protected copy constructor that derived classes can use to implement it.</p>
 <p>If you do not want to support copy/move operations on your type, explicity disable them using <code class="docutils literal"><span class="pre">=</span> <span class="pre">delete</span></code> in the <code class="docutils literal"><span class="pre">public:</span></code> section:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span class="c1">// MyClass is neither copyable nor movable.</span>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="c1">// MyClass is neither copyable nor movable.</span>
 <span class="n">MyClass</span><span class="p">(</span><span class="k">const</span> <span class="n">MyClass</span><span class="o">&amp;</span><span class="p">)</span> <span class="o">=</span> <span class="k">delete</span><span class="p">;</span>
 <span class="n">MyClass</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="k">const</span> <span class="n">MyClass</span><span class="o">&amp;</span><span class="p">)</span> <span class="o">=</span> <span class="k">delete</span><span class="p">;</span>
 </pre></div>

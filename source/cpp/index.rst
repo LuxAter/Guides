@@ -1681,102 +1681,1401 @@ otherwise the usual variable naming rules apply.
 Function Names
 --------------
 
+Regular functions have mixed case; accessors and mutators may be named like
+variables.
+
+Oridnarily, funcitons should start with a capital letter and have a capital
+letter for each new word (a.k.a "`Camel Case`_" or "Pascal case"). Such names
+should not have underscores. Prefer to capitalize acronyms as single words
+(e.e. `StartRpc()`, not `StartRPC()`).
+
+.. code-block:: cpp
+
+   AddTableEntry()
+   DeleteUrl()
+   OpenFileOrDie()
+
+(The same naming rule applies to calss- and namespace-scope constants that are
+exposed as part of an PAI and that are intended to look like function, because
+the fact that they're objects rather than function is an inimportant
+implementation detail.)
+
+Accessors and mutators (get and set functions) may be named like variables.
+These often correspond to actual member variables, but this is not required.
+For example, `int count()` and `void set_count(int count)`.
+
 Namespace Names
 ---------------
+
+Namespace names are all lowere-case. Top-level namespace anems are based on the
+project name. Avoid collisions between nested namespaces and well-known
+top-level namespaces.
+
+The name of a top-level namespace should usually be the name of the project or
+team whose code is contained in that namespace. The code in that namespace
+should usually be in a directory whose basename matches the namespace name (or
+subdirectories thereof).
+
+Keep in mind that the `rule against abbreviated names`_ applies to namespaces
+just as much as variable anmes. Code inside the namespace seldom needs to
+mention the namespace name, so there's usually no particular need for
+abbreviation anyway.
+
+Avoid nested namespaces that match well-known top-level namespaces. Collisions
+between namespac enames can lead to suprising build breaks because of name
+lookup rules. In particular, do not created any nested `std` namespaces. Prefer
+unique project identifiers (`websearch::index`, `websearch::index_util`) over
+collision-prone names kile `websearch::util`.
+
+For `internal` namespaces, be wary of other code being added to the same
+`internal` namespace causing a collision (internal helpers within a team tend
+to be related and may lead to collisions). In such a situation, using the
+filename to make a unique internal name is helpful
+(`websearch::index::frobber_internal` for use in `frobber.h`)
 
 Enumerator Names
 ----------------
 
+Enumerators (for both scoped and unscoped enums) should be named *either* like
+`constants`_ or like `macros`_: either `kEnumName` ro `ENUM_NAME`.
+
+Preferably, the individual enumerators should be named like `constants`_.
+However, it is also acceptable to name them like `macros`_. The enumeration
+name, `UrlTableErrors` (and `AlternateUrlTableErrors`), is a type, and therefor
+mixed case.
+
+.. code-block:: cpp
+
+   enum UrlTableErrors {
+     kOK = 0,
+     kErrorOutOfMemory,
+     kErrorMalformedInput,
+   };
+   enum AlternateUrlTableErrors {
+     OK = 0,
+     OUT_OF_MEMORY = 1,
+     MALFORMED_INPUT = 2,
+   };
+
+Until january 2009, the style was to name enum values like `macros`_. THis
+caused problems with name collisions between enum values and macros. Hence, the
+cange to prefer constant-style naming was put in place. New code should prefer
+constant-style naming if possible. However, there is no reason to change old
+code to use constant-style names, unless the old names are actually causing a
+compile-time problem.
+
 Macro Names
 -----------
 
-Exceptions to Naming Rules
---------------------------
+You're not really going to `define a macro`_, are you? If you do, they're like
+this: `MY_MACRO_THAT_SCARES_SMALL_CHILDREN`.
+
+Please see the `description of macros`_; in general macros should *not* be
+used. However, if they are absolutely needed, then they should be named with
+all capitals and underscores.
+
+.. code-block:: cpp
+
+   #define ROUND(x) ...
+   #define PI_ROUNDED 3.0
 
 Comments
 ========
 
+Though a pain to write, comments are absolutely vital to keeping our code
+readable. The following rules describe what you should comment and where. But
+remember: while comments are very important, the best code is self-documenting.
+Giing sensible names to types and variables is much better than using obscure
+names that you must then explain through comments.
+
+When writing you comments, write for your audience: the next contributor who
+will need to understnad you code. Be generous -- the next one may be you!
+
 Comment Style
 -------------
+
+Use either th `//` or `/* */` syntax, as long as you are consistent.
+
+You can use either the `//` or the `/* */` syntex; however, `//` is *much* more
+common. Be consistant with how you comment and what style you use where.
 
 File Comments
 -------------
 
+Start each file with license boilerplate.
+
+File comments describe the contents of a file. If a file declares, implements,
+or tests exactly one abstraction that is documented by a comment at the point
+of declaration, file comments are not required. All other files must have file
+comments.
+
+Legal Notice and Author Line
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Every file should contain license boilerplate. Choose the appropriate
+boilerplate for the license used by the project.
+
+If you make significnt changes to a file with an auther line, consider deleting
+the author line.
+
+File Contents
+^^^^^^^^^^^^^
+
+If a `.h` file declares multiple abstractions, the file-level comment should
+broadly describe the contents of the file, and how the abstractions are
+related. A 1 or 2 sentence file-level comment may be sufficient. The detailed
+documentation about individual abstractions belong with those abstractions, not
+at the file level.
+
+Do not duplicate comments in both the `.h` and the `.cc`. Duplicated comments
+diverge.
+
 Class Comments
 --------------
+
+Every non-obvious class declaration should have an accompanying comment that
+descries what it is for and how it should be used.
+
+.. code-block:: cpp
+
+   // Iterates over the contents of a GargantuanTable.
+   // Example:
+   //    GargantuanTableIterator* iter = table->NewIterator();
+   //    for (iter->Seek("foo"); !iter->done(); iter->Next()) {
+   //      process(iter->key(), iter->value());
+   //    }
+   //    delete iter;
+   class GargantuanTableIterator {
+     ...
+   };
+
+The class comment should provide the reader with enough information to know how
+and when to use the class, as well as any additional considerations necessary
+to correctly use the class. Document the synchronization assumptions the class
+makes, if any. If an instance of the class can be accessed by multiple threads,
+take extra care to document the rules and invariants surrounding multithreaded
+use.
+
+The class comment is often a good place for a small example code snippet
+demonstrating a simple and focused useage of the class.
+
+When sufficiently seperated (e.g. `.h` and `.cc` files), comments describing
+the use of the class should go together with its interface definition; comments
+about the class operation and implementation shoudl accompany the
+implementation of the class's methods.
 
 Function Comments
 -----------------
 
+Declaration comments describe use of the function (when it is non-obvious);
+comments at the definition of a function describe operation.
+
+Function Declarations
+^^^^^^^^^^^^^^^^^^^^^
+
+Almost every function declaration should have comments immediately preceding it
+that describes what the function does and how to use it. These comments may be
+omitted only if the function is simple and obvious (e.g. simple accessors for
+obvious properties of the class). These comments should be descriptive ("Opens
+the file") rather than imperative ("Open the file"); the comment describes the
+function, it does not tell the function what to do. In general, these comments
+do not describe how the function preforms its task. Instead, that should be
+left to comments in the funciton definition.
+
+Types of things to mention in comments at the function declaration:
+
+* What the inputs and outputs are.
+* For class member funcitons: whether the object remembers reference arguments
+  beyond the duration of the method call, and whether it will free them or not.
+* If the funciton allocates memory that the caller must free.
+* Wheter any of the arguments can be a null pointer.
+* IF there are any preformace implications of how a funciton is used.
+* If the funciton is re-entrant. What are its synchroniation assumptions?
+
+Here is an example:
+
+.. code-block:: cpp
+
+   // Returns an iterator for this table.  It is the client's
+   // responsibility to delete the iterator when it is done with it,
+   // and it must not use the iterator once the GargantuanTable object
+   // on which the iterator was created has been deleted.
+   //
+   // The iterator is initially positioned at the beginning of the table.
+   //
+   // This method is equivalent to:
+   //    Iterator* iter = table->NewIterator();
+   //    iter->Seek("");
+   //    return iter;
+   // If you are going to immediately seek to another place in the
+   // returned iterator, it will be faster to use NewIterator()
+   // and avoid the extra seek.
+   Iterator* GetIterator() const;
+
+However, od not be unnecessarily verbose or state the completely obviouse.
+Notice below that it is not necessary to say "returns false otherwise" because
+this is implied.
+
+.. code-block:: cpp
+
+   // Returns true if the table cannot hold any more entries.
+   bool IsTableFull();
+
+When documenting funciton overrides, focuse on the specifics of the override
+itself, rather than repeating the comment form the overridden function. In many
+cases, the override needs no additional documentation and thus no comment is
+required.
+
+When commenting constructors and esctructors, remember that the person reading
+you code knows what constructors and destructors are for, so comments that just
+say something like "destroys this object" are not useful. Document what
+constructors do with their arguments (for example, if they take ownership of
+pointers), and what cleanup the destructor does. If this is trivial, just skip
+the comment. Is is quite common for destructors not to have a header comment.
+
+Function Definitions
+^^^^^^^^^^^^^^^^^^^^
+
+If there is anything tricky about how a function does its job, the function
+definition should have an explanatory comment. For example, in the definition
+comment you might describe any coding tricks you use, give an overview of the
+steps you go through, or explain why you chose to implement the function in the
+way you did rather than using a viable alternative. For instance, you might
+mention why it must acquire a lock for the first half of the function but why
+it is not needed for the second half.
+
+Note you should *not* just repeat the comments given with the funciotn
+declaration, in the `.h` file or wherever. It's okay to recapitualte briefly
+what the funciton does, but the focuse of the comment should be on how it does
+it.
+
 Variable Comments
 -----------------
+
+In general the actual name of the variable should be descriptive enough to give
+a good idea of what the variable is used for. In certain cases, more comments
+are required.
+
+Class Data Members
+^^^^^^^^^^^^^^^^^^
+
+The purpose of each class data member (also called an instance variable or
+member variable) must be clear. If there are any invariants (special values,
+relationships between members, lifetime requirements) not clearl expressed by
+the type and name, they must be commented. However, if the type and name
+suffice (`int num_events_;`), no comment is needed.
+
+In particualr, add comments to describe the existence and meaning of sentinal
+values, such as `nullptr` or `-1`, when they are not obvious. For example:
+
+.. code-block:: cpp
+
+   private:
+    // Used to bounds-check table accesses. -1 means
+    // that we don't yet know how many entries the table has.
+    int num_total_entries_;
+
+Global Variables
+^^^^^^^^^^^^^^^^
+
+All global variables should have a comment describing what they are, what they
+are used for, and (if unclear) why it needs to be global. For example:
+
+.. code-block:: cpp
+
+   // The total number of tests cases that we run through in this regression test.
+   const int kNumTestCases = 6;
 
 Implementation Comments
 -----------------------
 
+In your implementation you should have comments in tricky, non-obvious,
+intresting, or important parts of your code.
+
+Explanatory Comments
+^^^^^^^^^^^^^^^^^^^^
+
+Tricky or complicated code blocks should have comments before them. Example:
+
+.. code-block:: cpp
+
+   // Divide result by two, taking into account that x
+   // contains the carry from the add.
+   for (int i = 0; i < result->size(); i++) {
+     x = (x << 8) + (*result)[i];
+     (*result)[i] = x >> 1;
+     x &= 1;
+   }
+
+Line Comments
+^^^^^^^^^^^^^
+
+Also, lines that are non-obvious should get a comment at the end of the line.
+These end-of-line comments should be separated from the code by 2 spaces.
+Example:
+
+.. code-block:: cpp
+
+   // If we have enough memory, mmap the data portion too.
+   mmap_budget = max<int64>(0, mmap_budget - index_->length());
+   if (mmap_budget >= data_size_ && !MmapData(mmap_chunk_bytes, mlock))
+     return;  // Error already logged.
+
+Not that there are both comments that describe what the code is doing, and
+comments that mention that an error has already been logged when the function
+returns.
+
+If you have several comments on subsequent lines, it can often be more readable
+to line them up:
+
+.. code-block:: cpp
+
+   DoSomething();                  // Comment here so the comments line up.
+   DoSomethingElseThatIsLonger();  // Two spaces between the code and the comment.
+   { // One space before comment when opening a new scope is allowed,
+     // thus the comment lines up with the following comments and code.
+     DoSomethingElse();  // Two spaces before line comments normally.
+   }
+   std::vector<string> list{
+                       // Comments in braced lists describe the next element...
+                       "First item",
+                       // .. and should be aligned appropriately.
+                       "Second item"};
+   DoSomething(); /* For trailing block comments, one space is fine. */
+
+Function Argument Comments
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+WHen the meaning of a function argument is nonobvious, consider one of the
+following remedies:
+
+* If the argument is a literal constant, and the same constant is used in
+  multiple function calls in a way that tacitly assumes they're the same, you
+  can use a named constant to make that constraint explicit, and to guarantee
+  that it holds.
+* Consider changing the funciton signature to replace a `bool` argument with an
+  `enum` argument. THis will make the argument values self-describing.
+* For functions that have several configuration options, consider defining a
+  single class or struct to hold all the options, and pass an instance fo that.
+  This approach has several advantages. Options are referenced by name at the
+  call site, which clarifies their meaning. It also reduces function argument
+  count, which makes function calls easier to read and write. As an added
+  benefit, you don't have to change call sites when you add another option.
+* Replace large or complex nested expressions with named variables.
+* As a last resort, use comments to clarify argument meanings at the call site.
+
+Consider the following example:
+
+.. code-block:: cpp
+
+   // What are these arguments?
+   const DecimalNumber product = CalculateProduct(values, 7, false, nullptr);
+
+versus:
+
+.. code-block:: cpp
+
+   ProductOptions options;
+   options.set_precision_decimals(7);
+   options.set_use_cache(ProductOptions::kDontUseCache);
+   const DecimalNumber product =
+       CalculateProduct(values, options, /*completion_callback=*/nullptr);
+
+Don'ts
+^^^^^^
+
+Do not state the obvious. In particular, don't literally describe what code
+does, unless the behavior is nonobvious to a reader who understands C++ well.
+Instead, provide higher level comments that describe *why* the code does what
+it does, or make the code self describing.
+
+Compare this:
+
+.. code-block:: cpp
+
+   // Find the element in the vector.  <-- Bad: obvious!
+   auto iter = std::find(v.begin(), v.end(), element);
+   if (iter != v.end()) {
+     Process(element);
+   }
+
+To this:
+
+.. code-block:: cpp
+
+   // Process "element" unless it was already processed.
+   auto iter = std::find(v.begin(), v.end(), element);
+   if (iter != v.end()) {
+     Process(element);
+   }
+
+Self-describing code doesn't need a comment. The comment from the example above
+would be obvious:
+
+.. code-block:: cpp
+
+   if (!IsAlreadyProcessed(element)) {
+     Process(element);
+   }
+
 Punctuation, Spelling and Grammar
 ---------------------------------
+
+Pay attention to punctuation, spelling, and grammar; it is easier to read
+well-written comments than badly written ones.
+
+Comments should be as radable as narative text, with proper capitalization and
+punctuation. In many cases, complete sentences are more readable than sentance
+fragments. Shorter comments, such as comments at the end of a line of code, can
+sometimes be less formal, but you should be consistent with your style.
+
+Although it can be frustrating to have a code reviewer point out that you are
+using a comman when you should be using a semicolon, it is very important that
+source code maintain a high level of clarity and readability. Proper
+punctuation, spelling, and grammar help with that goal.
 
 TODO Comments
 -------------
 
+Use `TODO` comments for code that is temporary, a short-term solution, or
+good-enought but not perfect.
+
+`TODO`\s should include the string `TODO` in call caps, follwed by the name,
+e-mail address, bug ID, or other identifier of the person or issue with the
+best context about the problem referenced by the `TODO`. THe main purpose is to
+have a consistent `TODO` that can be searched to find out how to get more
+details upon request. A `TODO` is not a commitment that the person referenced
+will fix the proble. THu when you create a `TODO` with a name, it is almost
+always your name that is given.
+
+.. code-block:: cpp
+
+   // TODO(kl@gmail.com): Use a "*" here for concatenation operator.
+   // TODO(Zeke) change this to use relations.
+   // TODO(bug 12345): remove the "Last visitors" feature
+
+If your `TODO` is of the form "at a future date do something" make sure that
+you either include a very specific date ("Fix by November 2005") or a very
+specific event ("Remove this code whn all clients can handle XML responses.").
+
 Deprecation Comments
 --------------------
+
+Mark seprecated interface points wiht `DEPRECATED` comments.
+
+You can mark an interface as deprecate dby writing a comment containing the
+word `DEPRECATED` in all caps. The comment goes either before the declaration
+of the interace or on the same line as the declaration.
+
+After the word `DEPRECATED`, write you name, e-mail address, or other identifer
+in parentheses.
+
+A deprecation comment must include simple, clear directions for people to fix
+their callsites. In C++, you can implement a deprecated function as an inline
+function that calls the new interface point.
+
+Marking an interface point `DEPRECATED` will not magically cause any callsites
+to change. If you want people to actually stop using the deprecated facility,
+you will have to fix the callsites yourself or recruit a crew to help you.
+
+New code should not contain calls to deprecated interface points. Use the new
+interface point instead. If you cannot undersntad the direcitions, find the
+person who created the deprecation and ask them for help using the new
+interface point.
 
 Formatting
 ==========
 
+Coding style and formatting are pretty arbitrary, but a project is much easier
+to follow if everyone uses the same style. Individuals may not agree with every
+aspect of the formatting rules, and some of the rules may take some getting
+used to, but it is importnat that all project contributors follow the style
+rules so that they can all read and understand everyone's code easily.
+
 Line Length
 -----------
+
+Each line of text in your code should be at most 80 cahracters long.
+
+We recognize that this ruel is controversial, but so much existing code already
+adheres to it, and we fell that consistency is important.
+
+Pros:
+   Those who favor this rule argue that it is rude to force them to resize
+   their windows and there is no need for anything longer. SOme folks are used
+   to having several code windows side by side, and thus dont have room to
+   widen their windows in any case. People set up their work environment
+   assuming a particular maximum window width, and 8- columns has been the
+   traditional standard. Why change it?
+
+Cons:
+   Proponents of change argume that a wider line can make code more readable.
+   The 80-column limit is an hidebound throwback to 1960s mainframes; modern
+   equipment has wide screens that can easily show longer lines.
+
+Descision:
+   80 characters is the maximum.
+
+Exception:
+   * Comment lines can be longer tham 80 characters if it is not feasible to
+     split them without harming readability, ease of cut and paste or
+     auto-linking -- e.g. if a line contains an example command or a literal
+     URL longer than 80 characters.
+   * A raw-string literal may have content that exceeds 80 characters. Except
+     fo rtest code, such literals should appear near the top of a file.
+   * An `#include` statement with a long path may exceed 80 columns.
+   * You needn't be concerend about `header guards`_ that exceed the maxiumum
+     length.
 
 Non-ASCII Characters
 --------------------
 
+Non-ASCII charactesr should be rare, and must use UTF-8 formatting.
+
+You shouldn't hard-code user facing text in source, even English, so use
+non-ASCII characters should be rare. However, in certain cases it is
+appropriate to include such words in you code. For example, if your code parses
+data files from foreign sources, it may be appropriate to hard-code the
+non-ASCII string(s) used in those data files as delimiters. More commonly,
+unittest code (which does not need to be localized) might contain non-ASCII
+string. In such cases, you should use UTF-8, since that is an encoding
+understood by most tools able to handle more than just ASCII.
+
+Hex encoding is OK, and encouraged where it enhances readability -- for
+example, "`\\xEF\\xBB\\xBF`", or, even more simply, `u8"\\uFEFF"`, is the Unicode
+xero-width no-break space character, which would be invisible if included in
+the source as straight UTF-8.
+
+use the `u8` prefix to guarantee that a string literal containing `\\uXXXX`
+escape sequences is encoded as UTF-8. Do not use it for string containing
+non-ASCII characters encoded as UTF-8, because that will produce incorrect
+output if the compiler does not interpret the source file as UTF-8.
+
+You shouldn't use the C++11 `char16_t` and `char32_t` character types, since
+they're for non-UTF-8 text. For similar reasons you also shouldn't use
+`wchar_t` (unless you're writing code that interacts with the Windows API,
+which uses `wchar_t` extensively).
+
 Spaces vs. Tabs
 ---------------
+
+Use only spaces, and indent 2 spaces at a time.
+
+We use spaces for indentation. DO not use tabs in your code. You should set
+your editor to emit spaces when you hit the tab key.
 
 Function Declarations and Definitions
 -------------------------------------
 
+Return type on the same line as function name, parameters on the same line if
+they fit. Wrap parameter lists which do not fit on a single line as you would
+wrap arguments in a `function call`_.
+
+Functions look like this:
+
+.. code-block:: cpp
+
+   ReturnType ClassName::FunctionName(Type par_name1, Type par_name2) {
+     DoSomething();
+     ...
+   }
+
+If you have too much text ot fit on one line:
+
+.. code-block:: cpp
+
+   ReturnType ClassName::ReallyLongFunctionName(Type par_name1, Type par_name2,
+                                                Type par_name3) {
+     DoSomething();
+     ...
+   }
+
+or if you cannot fit even the first parameter:
+
+.. code-block:: cpp
+
+   ReturnType LongClassName::ReallyReallyReallyLongFunctionName(
+       Type par_name1,  // 4 space indent
+       Type par_name2,
+       Type par_name3) {
+     DoSomething();  // 2 space indent
+     ...
+   }
+
+Some points to note:
+
+* Choose good parameter names.
+* Parameter names may be omitte donly if the parameter is unused and its
+  purpose is obvious.
+* If you cannot fit the return type and the function name on a single line,
+  break between them.
+* If you break after the return type of a function declaration or definitoin do
+  not indent.
+* The open parenthesis is always on the same line as the function name.
+* There is never a spcae betwen the funciton name and the open parenthesis.
+* There is never a space between the parentheses and the parameters.
+* The open curly brace is always on the end of the last line of the function
+  declaration, not the start of the next line.
+* THe close curly brace is either on the last line by itself or on the same
+  line as the open curly brace.
+* There should be a space between the close parenthesis and the open curly
+  brace.
+* All parameters should be alligned if possible.
+* Default indentation is 2 spaces.
+* Wrapped parameters have a 4 space indent.
+
+Unused parameters that are obvious from context may be omitted:
+
+.. code-block:: cpp
+
+   class Foo {
+    public:
+     Foo(Foo&&);
+     Foo(const Foo&);
+     Foo& operator=(Foo&&);
+     Foo& operator=(const Foo&);
+   };
+
+Unused parameters that might not be obviouse should comment out the variable
+name in the function definition:
+
+.. code-block:: cpp
+
+   class Shape {
+    public:
+     virtual void Rotate(double radians) = 0;
+   };
+
+   class Circle : public Shape {
+    public:
+     void Rotate(double radians) override;
+   };
+
+   void Circle::Rotate(double /*radians*/) {}
+
+.. code-block:: cpp
+
+   // Bad - if someone wants to implement later, it's not clear what the
+   // variable means.
+   void Circle::Rotate(double) {}
+
+Attributes, and macros that expand to attributes, appear at the very beginning
+of the function declaration or definition, before the return type:
+
+.. code-block:: cpp
+
+   MUST_USE_RESULT bool IsOk();
+
+
 Lambda Expressions
 ------------------
+
+Format parameters and bodies as for any other funcitn, and capture list like
+other comma-separated lists.
+
+For by-reference captures, do not leave a space between the ampersand (`&`) and
+the variable name.
+
+.. code-block:: cpp
+
+   int x = 0;
+   auto x_plus_n = [&x](int n) -> int { return x + n; }
+
+Short lambdas may be written inline as function arguments.
+
+.. code-block:: cpp
+
+   std::set<int> blacklist = {7, 8, 9};
+   std::vector<int> digits = {3, 9, 1, 8, 4, 7, 1};
+   digits.erase(std::remove_if(digits.begin(), digits.end(), [&blacklist](int i) {
+                  return blacklist.find(i) != blacklist.end();
+                }),
+                digits.end());
 
 Function Calls
 --------------
 
+Either write the call all on a single line, wrap the arguments at the
+parenthesis, or start the areguments on a new line indented by four spaces and
+continue at that 4 space indent. In the absence of other considerations, use
+the minimum number of lines, including placing multiple arguments on each line
+where appropriate.
+
+Function calls have the following format:
+
+.. code-block:: cpp
+
+   bool result = DoSomething(argument1, argument2, argument3);
+
+If the arguments do not all fit on one line, they should be broken up onto
+multiple lines, with each subsequent line aligned with the first argument. Do
+not add spaces after the open paren or before the close paren:
+
+.. code-block:: cpp
+
+   bool result = DoSomething(averyveryveryverylongargument1,
+                             argument2, argument3);
+
+Arguments may optionally all be placed on subsequent lines with a four space
+indent:
+
+.. code-block:: cpp
+
+   if (...) {
+     ...
+     ...
+     if (...) {
+       bool result = DoSomething(
+           argument1, argument2,  // 4 space indent
+           argument3, argument4);
+       ...
+     }
+   }
+
+Put multiple arguments on a single line to reduce the number of lines necessary
+for calling a function unless there is a specific readablility problem. Some
+find that formatting with strictly one argument on each line is more readable
+and simplifies editing of the arguments. However, we prioritize for the reader
+over the ease of editing arguments, and most readability problems are better
+addressed with the following techniques.
+
+If having multiple arguments in a single line decreases readability due to the
+complexity or confusing nature of the expressions that make up some arguments,
+try creating variables that capture those arguments in a descriptive name:
+
+.. code-block:: cpp
+
+   int my_heuristic = scores[x] * y + bases[x];
+   bool result = DoSomething(my_heuristic, x, y, z);
+
+Or put the confusing argument on its own line with an explanatory comment:
+
+.. code-block:: cpp
+
+   bool result = DoSomething(scores[x] * y + bases[x],  // Score heuristic.
+                             x, y, z);
+
+If there is still a case where one argument is significantl more readable on
+its own line, the put it on its own line. The decision should be specific to
+the argument which is made more readable rather than a general policy.
+
+Sometimes areguments form a structure that is important for readability. In
+those cases, feel free to format the argument according to that structure:
+
+.. code-block:: cpp
+
+   // Transform the widget by a 3x3 matrix.
+   my_widget.Transform(x1, x2, x3,
+                       y1, y2, y3,
+                       z1, z2, z3);
+
+
 Braced Initializer List Format
 ------------------------------
+
+Format a `braced initializer list`_ exactly like you would format a function
+call in its place.
+
+If the braced list follows a name (e.g. a type of variable name), format as if
+the `{}` were the parentheses of a function call with that name. If there is no
+name, assume a zero-length name.
+
+.. code-block:: cpp
+
+   // Examples of braced init list on a single line.
+   return {foo, bar};
+   functioncall({foo, bar});
+   std::pair<int, int> p{foo, bar};
+
+   // When you have to wrap.
+   SomeFunction(
+       {"assume a zero-length name before {"},
+       some_other_function_parameter);
+   SomeType variable{
+       some, other, values,
+       {"assume a zero-length name before {"},
+       SomeOtherType{
+           "Very long string requiring the surrounding breaks.",
+           some, other values},
+       SomeOtherType{"Slightly shorter string",
+                     some, other, values}};
+   SomeType variable{
+       "This is too long to fit all in one line"};
+   MyType m = {  // Here, you could also break before {.
+       superlongvariablename1,
+       superlongvariablename2,
+       {short, interior, list},
+       {interiorwrappinglist,
+        interiorwrappinglist2}};
 
 Conditionals
 ------------
 
+Prefer no spaces inside parentheses. The `if` and `else` keywords belong on
+separate lines.
+
+There are two acceptable formats for a basic conditional statement. One
+includes spaces between the parentheses and the condition, and one does not.
+
+The most common form is without spaces. Either is fine, but *be consistant*. If
+you are modifying a file, use the format that is already present. If you are
+writing new code, use the format that the other files in that directory or
+project use. If in doubt and you have no personal preference, do not add the
+spaces.
+
+.. code-block:: cpp
+
+   if (condition) {  // no spaces inside parentheses
+     ...  // 2 space indent.
+   } else if (...) {  // The else goes on the same line as the closing brace.
+     ...
+   } else {
+     ...
+   }
+
+If you prefer you may add spaces inside the parentheses:
+
+.. code-block:: cpp
+
+   if ( condition ) {  // spaces inside parentheses - rare
+     ...  // 2 space indent.
+   } else {  // The else goes on the same line as the closing brace.
+     ...
+   }
+
+Note that in all cases you must have a space between the `if` and the open
+parenthesis. You must also have a space betwen the close parenthesis and the
+curly brace, if you're using one.
+
+.. code-block:: cpp
+
+   if(condition) {}   // Bad - space missing after IF.
+   if (condition){}   // Bad - space missing before {.
+   if(condition){}    // Doubly bad.
+
+.. code-block:: cpp
+
+   if (condition) {}  // Good - proper space after IF and before {.
+
+Short conditional statements may be written on one line if thsi enhances
+readability. You may use this only when the line is brief and the statement
+does not use the `else` clause.
+
+.. code-block:: cpp
+
+   if (x == kFoo) return new Foo();
+   if (x == kBar) return new Bar();
+
+This is not allowed when the if statement has an `else`:
+
+.. code-block:: cpp
+
+   // Not allowed - IF statement on one line when there is an ELSE clause
+   if (x) DoThis();
+   else DoThat();
+
+In general, curly braces are not required for single-line statements, but they
+are allowed if you like them; conditional or loop statements with complex
+conditions or statements may be more readably with curly braces. Some projects
+require that an `if` must always always have an accompanying brace.
+
+.. code-block:: cpp
+
+   if (condition)
+     DoSomething();  // 2 space indent.
+
+   if (condition) {
+     DoSomething();  // 2 space indent.
+   }
+
+However, if one part of an `if-else` statement uses curly braces, the other
+part must too:
+
+.. code-block:: cpp
+
+   // Not allowed - curly on IF but not ELSE
+   if (condition) {
+     foo;
+   } else
+     bar;
+
+   // Not allowed - curly on ELSE but not IF
+   if (condition)
+     foo;
+   else {
+     bar;
+   }
+
+.. code-block:: cpp
+
+   // Curly braces around both IF and ELSE required because
+   // one of the clauses used braces.
+   if (condition) {
+     foo;
+   } else {
+     bar;
+   }
+
 Loops and Switch Statements
 ---------------------------
+
+Switch statements may use braces for blocks. Annotate non-trivial fall-through
+between cases. Braces are optional for single-statement loops. Empty loop
+bodies should use empty braces or `continue`.
+
+`case` blocks in `switch` statements can have curly braces or not, depending on
+your preference. If you do include curly braces  they should be places as shown
+below.
+
+If not conditional on an enumerated value, switch statements should always have
+a `desfault` case (in the case of an enumerated value, the compiler will warn
+you if any values are not handled). If the default case should never execute,
+simply `assert`:
+
+.. code-block:: cpp
+
+   switch (var) {
+     case 0: {  // 2 space indent
+       ...      // 4 space indent
+       break;
+     }
+     case 1: {
+       ...
+       break;
+     }
+     default: {
+       assert(false);
+     }
+   }
+
+Braces are optional for single-statement loops.
+
+.. code-block:: cpp
+
+   for (int i = 0; i < kSomeNumber; ++i)
+     printf("I love you\n");
+
+   for (int i = 0; i < kSomeNumber; ++i) {
+     printf("I take it back\n");
+   }
+
+Empty loop bodies should use an empty pari of braces or `continue`, but not a
+single semicolon.
+
+.. code-block:: cpp
+
+   while (condition) {
+     // Repeat test until it returns false.
+   }
+   for (int i = 0; i < kSomeNumber; ++i) {}  // Good - one newline is also OK.
+   while (condition) continue;  // Good - continue indicates no logic.
+
+
+.. code-block:: cpp
+
+   while (condition);  // Bad - looks like part of do/while loop.
+
+Pointer and Reference Expressions
+---------------------------------
+
+No spaces around period or arrow. Pointer operatord ddo not have trailing
+spaces.
+
+The following are examples of correctly-formatted pointer and reference
+expressions:
+
+.. code-block:: cpp
+
+   x = *p;
+   p = &x;
+   x = r.y;
+   x = r->y;
+
+Note that:
+
+* There are no spaces sround the period or arrwo when accessing a member.
+* Pointer operators have no space after the `*` or `&`.
+
+When declaring a pointer variable or argument, you may place the asterisk
+adjacent to either the type or to the variable name:
+
+.. code-block:: cpp
+
+   // These are fine, space preceding.
+   char *c;
+   const string &str;
+
+   // These are fine, space following.
+   char* c;
+   const string& str;
+
+It is allowed (if unsual) to declare multiple varaibles in the same
+declaration, but it is disallowed if any of theose have poitner ro reference
+decorations. Such declarations are easily misread.
+
+.. code-block:: cpp
+
+   // Fine if helpful for readability.
+   int x, y;
+
+.. code-block:: cpp
+
+   int x, *y;  // Disallowed - no & or * in multiple declaration
+   char * c;  // Bad - spaces on both sides of *
+   const string & str;  // Bad - spaces on both sides of &
+
+You should do this consistently within a single file, so, when modifying an
+existing file, use the style in that file.
 
 Boolean Expressions
 -------------------
 
+When you have a boolean expression that is longer than the `standard line
+length`_, be consistent in how you break up the lines.
+
+In this example, the logical AND operaor is always at the end of the lines:
+
+.. code-block:: cpp
+
+   if (this_one_thing > this_other_thing &&
+       a_third_thing == a_fourth_thing &&
+       yet_another && last_one) {
+     ...
+   }
+
+Note that when the code wraps in this example, both of the `&&` logical AND
+operators are at the end of the line. This is more common in Google code,
+though wrapping all operators at the beginning of the line is also allowed.
+Feel free to insert extra parentheses judiciously because they can be very
+helpful in increasing readability when used appropriately. Also note that you
+should always use the punctuation operators, such as `&&`` and `~` , rather
+than the word operators, such as `and` and `compl`.
+
 Return Values
 -------------
+
+Do not needlessly sorround the `return` expression with parentheses.
+
+Use parentheses in `return expr;` only where you would use them in `x = expr;`
+
+.. code-block:: cpp
+
+   return result;                  // No parentheses in the simple case.
+   // Parentheses OK to make a complex expression more readable.
+   return (some_long_condition &&
+           another_condition);
+
+.. code-block:: cpp
+
+   return (value);                // You wouldn't write var = (value);
+   return(result);                // return is not a function!
 
 Variable and Array Initialization
 ---------------------------------
 
+Your choice of `=`, `()`, or `{}`.
+
+You may choose between `=`, `()`, and `{}`; the following are all correct:
+
+.. code-block:: cpp
+
+   int x = 3;
+   int x(3);
+   int x{3};
+   string name = "Some Name";
+   string name("Some Name");
+   string name{"Some Name"};
+
+Be careful when using braced initialization list `{...}` on a type with an
+`std::initializer_list` constructor. A nonempty *braced-init-list* prefers the
+`std::initializr_list` constructor whenever possible. Not that empty braces
+`{}` are special, and will call a default construcotr if abailable. To force
+the non- `std::initializer_list` constructor, use parentheses instead of
+braces.
+
+.. code-block:: cpp
+
+   std::vector<int> v(100, 1);  // A vector of 100 1s.
+   std::vector<int> v{100, 1};  // A vector of 100, 1.
+
+Also, the brace form prevents narrowing of integral types. THis can prevent
+some types of programming errors.
+
+.. code-block:: cpp
+
+   int pi(3.14);  // OK -- pi == 3.
+   int pi{3.14};  // Compile error: narrowing conversion.
+
 Preprocessor Directives
 -----------------------
+
+The hash mark that starts a preprocessor directive should always be at the
+begining of the line.
+
+Even when preprocessor directives are within the body of indented code, the
+directives should start at the beginning of the line.
+
+.. code-block:: cpp
+
+   // Good - directives at beginning of line
+     if (lopsided_score) {
+   #if DISASTER_PENDING      // Correct -- Starts at beginning of line
+       DropEverything();
+   # if NOTIFY               // OK but not required -- Spaces after #
+       NotifyClient();
+   # endif
+   #endif
+       BackToNormal();
+     }
+
+.. code-block:: cpp
+
+   // Bad - indented directives
+     if (lopsided_score) {
+       #if DISASTER_PENDING  // Wrong!  The "#if" should be at beginning of line
+       DropEverything();
+       #endif                // Wrong!  Do not indent "#endif"
+       BackToNormal();
+     }
 
 Class Format
 ------------
 
+Sections in `public`, `protected`, and `private` order, each indented one
+space.
+
+The basic format for a class definition (lacking the comments, see `class
+comments`_ for a discussion of what comments are needed) is:
+
+.. code-block:: cpp
+
+   class MyClass : public OtherClass {
+    public:      // Note the 1 space indent!
+     MyClass();  // Regular 2 space indent.
+     explicit MyClass(int var);
+     ~MyClass() {}
+
+     void SomeFunction();
+     void SomeFunctionThatDoesNothing() {
+     }
+
+     void set_some_var(int var) { some_var_ = var; }
+     int some_var() const { return some_var_; }
+
+    private:
+     bool SomeInternalFunction();
+
+     int some_var_;
+     int some_other_var_;
+   };
+
+Things to note:
+
+* Any base class name should be on the same line as the subclass name, subject
+  to the 80-column limit.
+* the `public:`, `protected:`, and `private:` keywords should be indented one
+  space.
+* Except for the first instance, these keywords should be preceded by a blank
+  line. This rule is optional in small classes.
+* Do not leave a blank line after these keywords.
+* The `public` section should be first, followed by the `protected` and finally
+  the `private` section.
+* See `Declaration Order`_ for rules on ordering declarations within each of
+  these sections.
+
 Constructor Initializer Lists
 -----------------------------
+
+Constructor initializer lists can ba all on one line or with subsequent lines
+indented four spaces.
+
+The acceptable formats for initializer lists are:
+
+.. code-block:: cpp
+
+   // When everything fits on one line:
+   MyClass::MyClass(int var) : some_var_(var) {
+     DoSomething();
+   }
+
+   // If the signature and initializer list are not all on one line,
+   // you must wrap before the colon and indent 4 spaces:
+   MyClass::MyClass(int var)
+       : some_var_(var), some_other_var_(var + 1) {
+     DoSomething();
+   }
+
+   // When the list spans multiple lines, put each member on its own line
+   // and align them:
+   MyClass::MyClass(int var)
+       : some_var_(var),             // 4 space indent
+         some_other_var_(var + 1) {  // lined up
+     DoSomething();
+   }
+
+   // As with any other code block, the close curly can be on the same
+   // line as the open curly, if it fits.
+   MyClass::MyClass(int var)
+       : some_var_(var) {}
 
 Namespace Formatting
 --------------------
 
+The contents of namespaces are not indented.
+
+`Namespaces`_ do not add an extra level of indentation. For example, use:
+
+.. code-block:: cpp
+
+   namespace {
+
+   void foo() {  // Correct.  No extra indentation within namespace.
+     ...
+   }
+
+   }  // namespace
+
+Do not indent within a namespace:
+
+.. code-block:: cpp
+
+   namespace {
+
+     // Wrong.  Indented when it should not be.
+     void foo() {
+       ...
+     }
+
+   }  // namespace
+
+When declaring nested namespaces, put each namespace on its own line.
+
+.. code-block:: cpp
+
+   namespace foo {
+   namespace bar {
+   }
+   }
+
 Horizontal Whitespace
 ---------------------
+
+Use of horizontal whitespace depend on location. Never put trailing whitespace
+at the end of a line.
+
+General
+^^^^^^^
+
+.. code-block:: cpp
+
+   void f(bool b) {}  // Open braces should always have a space before them.
+     ...
+   int i = 0;  // Semicolons usually have no space before them.
+   // Spaces inside braces for braced-init-list are optional.  If you use them,
+   // put them on both sides!
+   int x[] = { 0 };
+   int x[] = {0};
+
+   // Spaces around the colon in inheritance and initializer lists.
+   class Foo : public Bar {
+    public:
+     // For inline function implementations, put spaces between the braces
+     // and the implementation itself.
+     Foo(int b) : Bar(), baz_(b) {}  // No spaces inside empty braces.
+     void Reset() { baz_ = 0; }  // Spaces separating braces from implementation.
+     ...
+   }
+
+Addign trailing whitespace can cause extra work for other editing the same
+file, when they merge, as can removing existing trailing whitespace. So: DOn't
+introduce trailing whitespace. Remove it if you're alreadiy changing that line,
+or do it in a separate clean-up operation (preferably when no-one else is
+working on the file).
+
+Loops and Conditionals
+^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   if (b) {          // Space after the keyword in conditions and loops.
+   } else {          // Spaces around else.
+   }
+   while (test) {}   // There is usually no space inside parentheses.
+   switch (i) {}
+   for (int i = 0; i < 5; ++i) {}
+   // Loops and conditions may have spaces inside parentheses, but this
+   // is rare.  Be consistent.
+   switch ( i ) {}
+   if ( test ) {}
+   for ( int i = 0; i < 5; ++i ) {}
+   // For loops always have a space after the semicolon.  They may have a space
+   // before the semicolon, but this is rare.
+   for ( ; i < 5 ; ++i) {
+     ...
+   }
+   // Range-based for loops always have a space before and after the colon.
+   for (auto x : counts) {
+     ...
+   }
+   switch (i) {
+     case 1:         // No space before colon in a switch case.
+       ...
+     case 2: break;  // Use a space after a colon if there's code after it.
+   }
+
+Operators
+^^^^^^^^^
+
+.. code-block:: cpp
+
+   // Assignment operators always have spaces around them.
+   x = 0;
+
+   // Other binary operators usually have spaces around them, but it's
+   // OK to remove spaces around factors.  Parentheses should have no
+   // internal padding.
+   v = w * x + y / z;
+   v = w*x + y/z;
+   v = w * (x + z);
+
+   // No spaces separating unary operators and their arguments.
+   x = -5;
+   ++x;
+   if (x && !y)
+     ...
+
+Templates and Casts
+^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: cpp
+
+   // No spaces inside the angle brackets (< and >), before
+   // <, or between >( in a cast
+   std::vector<string> x;
+   y = static_cast<char*>(x);
+
+   // Spaces between type and pointer are OK, but be consistent.
+   std::vector<char *> x;
+
 
 Vertical Whitespace
 -------------------
 
+Minimize use of vertical whitespace.
+
+This is more a principle than a rule: don't use blank lines when you don't have
+to. In particulary, don't put more than one or two blank lines between
+functions, resist starting functions with a blank line, don't end functions
+with a blank line, and be discriminating with your sue of blank lines inside
+functions.
+
+The basic principle is: The more code that fits on one screen, the easier it is
+to follow and understnad the control flow of the progrm. Of course, readability
+can suffer from code being too dense as well as too spread out, so use your
+judgement. But in general, minimize use of vertical whitespace.
+
+Some rules of thumb to help when blank lines may be useful:
+
+* Blank lines at the beginning or end of a function very rarely help
+  readability.
+* Blank lines inside a chain of if-else blocks may well help readability.

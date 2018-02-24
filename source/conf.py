@@ -20,6 +20,7 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
+# sys.path[0:0] = [os.path.abspath('_themes/foundation-sphinx-theme')]
 
 
 # -- General configuration ------------------------------------------------
@@ -89,7 +90,9 @@ html_theme = 'alabaster'
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    "show_related": True
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -103,6 +106,8 @@ html_static_path = ['_static']
 # refs: http://alabaster.readthedocs.io/en/latest/installation.html#sidebars
 html_sidebars = {
     '**': [
+        'about.html',
+        'navigation.html',
         'relations.html',  # needs 'show_related': True theme option to display
         'searchbox.html',
     ]
@@ -166,7 +171,6 @@ texinfo_documents = [
 ]
 
 
-
 # -- Options for Epub output ----------------------------------------------
 
 # Bibliographic Dublin Core info.
@@ -186,5 +190,3 @@ epub_copyright = copyright
 
 # A list of files that should not be packed into the epub file.
 epub_exclude_files = ['search.html']
-
-

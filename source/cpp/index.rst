@@ -1438,32 +1438,495 @@ Other C++ Features
 Rvalue References
 -----------------
 
+Use rvaue references only to define move construtors and move assignment
+operators, or to perfect forwarding.
+
+Definition:
+   Rvalue references are a type of reference that can only bind to temporary
+   objects. THe syntax is similar to traditional reference syntax. For examle,
+   `void f(string&& s);` declars a function whose arugment is an rvalue
+   reference to a string.
+
+Pros:
+* Defining a move constructor (a constructor taking an rvalue reference to the
+  class type) makes it possible to move a value instead of copying it. If `v`
+  is a `std::vector<string>`, for example, then `auto v2(std::move(v1))` will
+  probably just result in some simple pointr manipulation instead of copying a
+  large amount of data. In some cases this can result in a major preformance
+  improvement.
+* Rvalue references make it pssible to write a generic function wrapper that
+  forwards its arguments to another function, and works whether of not its
+  areguments are temporary objects. (This is sometimes called "perfect
+  forwarding".)
+* Rvalue references make it possible to implement types that are movable but
+  not copyable, which can be useful for types that have no sensible definition
+  of copying but where you might still want to pass them as a funciton
+  arguments, put them in containers, etc.
+* `std::move` is necessary to make effective use of some standard-library
+  types, such as `std::unique_ptr`.
+
+Cons:
+* Rvalue references are a relatively new features (introduced as part of
+  C++11), and not yet widely understood. Rules like reference collapsing, and
+  automatic synthesis of move constructors are compicated.
+
+Decision:
+   Use rvalue references only to define move constructors and move assignement
+   operators (as described in `Copyable and Movable Types`_) and, in
+   conjunction with `std::forward`_, to support perfect forwarding. You may use
+   `std::move` to express moveing a value from one object to another rather
+   than copying it.
+
 Friends
 -------
+
+We allow use of `friend` classes and function, within reason.
+
+Friends shuold usualy be defined in the same file so that the reader does not
+have to look in another file to find uses of the private members of a class. A
+common use of `friend` is to have a `FooBuilder` class be a friend of `Foo` so
+that it can construct the inner state of `Foo` correctly. without exposing this
+state to the world. In some cases it may be useful to make a unittest class a
+friend of the class it tests.
+
+Friends extend, but do not break the encapsulation boundary of a class. In some
+cases this is better than makeing a member public when you want to give only
+one other class access to it. However, most classes should interact with other
+classes solely though their public members.
 
 Exceptions
 ----------
 
+We do not use C++ exceptions.
+
+Pros:
+* Exceptions allow higher levels of an application to decide how to handle
+  "can't happen" failures in deeply nested functions, without the obscuring and
+  error-prone bookkeeping of error codes.
+* Exceptions are used by most other modern languages. Using them in C++ would
+  make it more consistent with Python, Java and the C++ that others are
+  familiar with.
+* Some third-party C++ libraries use exceptions, and turning them off
+  internally makes it harder to integrate with those libraries.
+* Exceptions are the only way for a ctonstructor to fail. We can simulate this
+  with a factory function or `Init()` method, but these require heap allocation
+  or a new "invalid" state, respectively.
+* Exceptions are really handy in testing frameworks.
+
+Cons:
+* When you add `throw` statement to an existing function, you must examine all
+  of its transitive callers. Either they must make at least the basic exception
+  safety guarantee, or they must never catch the exception and be happy with
+  the program terminating as a result. For instance if `f()` calls `g()` calls
+  `h()`, and `h` throws an exception that `f` catches, `g` has to be careful or
+  it may not clean up properly.
+* More generally, exceptions  make the control flow of programs difficult to
+  evaluate by looking at code: funciton may return in places you don't expect.
+  This causes maintainability and debugging difficulties. You can minimize this
+  cost via some ruels on how and where exceptions can be used, but at the cost
+  of more than a developer needs to knwo and understand.
+* Exception safety requires both RAII and different coding practices. Lots of
+  supporting machinery is needed ot make writing correct exceptions-safe code
+  easy. Further, to avoid requiring readers to understnad the entire call
+  graph, exception-safe code must isolate loging that writes to persist state
+  into a "commit" phase. This will have both benefits and costs (perhaps where
+  you're forced to obfuscate code to isolate the commit). Allowing exceptions
+  would force us to always pay those costs even when they're not worth it.
+* Turning on exceptions adds data to each binary produced, increasing compile
+  time (probably sightly) and possibly increasing address space pressure.
+* The availability of exceptions may encourage developers to throw them when
+  they are not appropriate or recover from them when it's not safe to do so.
+  For example, invalid user input should not cause exceptions to be thrown. We
+  would need to make the style guide even longer to document these
+  restrictions!
+
+Decision:
+   On their face, the benefit sof using exceptiosn outweight the costs,
+   especially in new projects. However, for existing code, the introduction of
+   exceptions has implications on all dependent code. If exceptions can be
+   propagated beyoned a new project, it also becomes problematic to integrate
+   the new project into existing exception-free code. Because more existing
+   C++ code at Google is not prepared to deal with exceptions, it is
+   comparatively difficult to adopt new code that generates exceptions.
+
+   Gien that Google's existing code is not exception-tolerant, the costs of
+   using exceptions are somewhat greater than the costs in a new project. THe
+   conversion process would be slow and error-prone. We don't believe that the
+   available alternatives to exceptions, such as error codes and assertions,
+   introduce a significant burden.
+
+   Our advice against using exceptiosn is not predicated on philosophical or
+   moral grounds, but practical ones. Because we'd like to use our open-source
+   projects at Google and it's difficult to do so if those projects use
+   exceptions, we need to advise against exceptions in Google open-source
+   projects as well. Things would probably be different if we had to do it all
+   over again from scratch.
+
+   This prohibition also applies to the exception-related features added in
+   C++11.
+
+noexcept
+--------
+
+Specify `noexcept` when it is useful and correct.
+
+Definition:
+   The `noexcept` specifier is used to specify whether a function will throw
+   exceptions or not. If an exception escapes from a funciton marked
+   `noexcept`, the program crashes via `std::terminate`.
+
+   THe `noexcept` operator preformes a compile-time check that returns `true`
+   if an excpression is declared to not throw any exception.
+
+Pros:
+* Specify move constructors as `noexcept` improves preformance in some cases,
+  e.g. `std::vector<T>::resize()` moves rather than copies the objects if
+  `T`\'s move constructor is `noexcept`.
+* Specifying `noexcept` on a function can trigger compiler optimizations in
+  environments where exceptions are enabled, e.g. compiler does not have to
+  generate extra code for stack-unwinding, if it knows that no exceptions can
+  be thrown due to a `noexcept` specifier.
+
+Cons:
+* In projects following this guide that have exceptions disabled it is hard to
+  ensure that `noexcept` specifiers are correct, and hard to define what
+  correctness even means.
+* It's hard, if not impossible, ot undo `noexcept` because it eliminates a
+  guarantee that callers may be relying on, in ways that are hard to detect.
+
+Decision:
+   You may use `noexcept` when it is useful for preformance if it accurately
+   reflects the intended semantics of your funciton, i.e. that if an exceptions
+   is somehow thrown from within the function body than it represents a fatal
+   error. You can assume that `noexcept` on move constructors has a meaningful
+   preformace benefit. If you think there is significant preformance benefit
+   from specifying `noexcept` on other function, please discuss it with your
+   project leads.
+
+   Prefer unconditional `noexcept` if exceptions are completely disabled.
+   Otherwise, use conditional `noexcept` specifiers with simple conditions, in
+   ways that evaluate false only in a few cases where the function could
+   potentiall throw. The tests might include type traits check on whether the
+   involved operation might throw (e.g. `std::is_nothrow_move_constructible`
+   for move-constructing objects), or on whether allocation can throw (e.g.
+   `absl::default_allocator_is_nothrow` for standard default allocation). Note
+   in many cases the only possible cause for an exception is allocation failure
+   (we believe move constructors should not throw except due to allocation
+   failure), and there are many applications where it's appropriate to treat
+   memory exhaustion as a fatal error rather than an exceptional condition that
+   your program should attempt to recover from. Even for other potential
+   failures you should prioritize interface simplicity over supporting all
+   possible exception throwing scenarios: instead of writinga  complicated
+   `noexcept` clause that depends on whether a hash function can throw, for
+   example, simply document that your component doesn't support has functions
+   throwing and makes it unconditionally `noexcept`.
+
 Run-Time Type Information(RTTI)
 -------------------------------
+
+Avoid using Run Type Infrmation (RTTI).
+
+Definition:
+   RTTI allows a programmer to query the C++ class of an object at run time.
+   THis is done by use of `typeid` or `dynamic_cast`.
+
+Cons:
+   Querying the type of an object at run-time frequently means a design
+   problem. Needing to know the type of an object at runtime is often an
+   indication that the design of your class hierarchy is flawed.
+
+Pros:
+   The standard alternatives to RTTI (described below) require modification or
+   redesign of the class hierarchy in question. Sometimes such modifications
+   are infeasible or undesirable, particularly in widely-used or mature code.
+
+   RTTI can be useful in some unit tests. FOr example, it is useful in tests of
+   factory classes where the test has to verify that a newly created object has
+   the expected dynamic type. It is also useful in managing the relationship
+   between objects and their mocks.
+
+   .. code-block:: cpp
+
+      bool Base::Equal(Base* other) = 0;
+      bool Derived::Equal(Base* other) {
+        Derived* that = dynamic_cast<Derived*>(other);
+        if (that == nullptr)
+          return false;
+        ...
+      }
+
+Decision:
+   RTTI has legitimate uses but is prone to abuse, so you must be careful when
+   using it. You may use it freely in unittests, but avoid it when possible in
+   other code. In particular, think twice before using RTTI in new code. If you
+   find yourself needing to write code that behaves differently based on the
+   class of an object, consider one of the following alternatives to querying
+   the type:
+
+   * Virtual methods are the preferred way of executing different code paths
+     depending on a specific subclass type. THis puts the work within the
+     object itself.
+   * If the work belongs outside the object and instead in some processing
+     code, consider a double-dispatch solution, such as the Visitor design
+     pattern. This allows a facility outside the object itself to determine
+     the type of class using the built-in type system.
+
+   When the logic of a program guarantees that a given instance of a base class
+   is in fact an instance of a particular derived class, then a `dynamic_cast`
+   may be used freely on the object. Usually one can use a `static_cast` as an
+   alternative in such situations.
+
+   Decision trees based on type are a strong indication that your code is on
+   the wrong track.
+
+   .. code-block:: cpp
+
+      if (typeid(*data) == typeid(D1)) {
+        ...
+      } else if (typeid(*data) == typeid(D2)) {
+        ...
+      } else if (typeid(*data) == typeid(D3)) {
+      ...
+      }
+
+   Code such as this usually breaks when additional subclasses are added to the
+   class hierachy. Moreover, when properties of a subclass change, it is
+   difficult to find and modify all the affected code segments.
+
+   Do not hand-implement an RTTI-like workaround. The arguments against RTTI
+   apply just as much to workaround like class hierarchies with type tags.
+   Moreover, workarounds disguise your true intent.
 
 Casting
 -------
 
+Use C++-style casts like `static_cast<float>(double_value)`, or brace
+initialization for conversions of arithmetic types like `int64 y = int64{1} <<
+42`. Do not use cast formates like `int y = (int)x` or `int y = int(x)` (but
+the latter is okay when invoking a constructor of a class type).
+
+Definitions:
+   C++ intoduced a different cast system from C that distinguishes the types of
+   cast operations.
+
+Cons:
+   The C++-style cast syntax is verbose and cumbersome.
+
+Decision:
+   Do not use C-style casts. Instead, use these C++-style casts when explicit
+   type conversion is necessary.
+
+   * Use brace initialization to convert arithmetic types (e.g. `int64{x}`).
+     This is the safest approach because code will not compile if conversion
+     can result in information loss. They sytax is also concise.
+   * Use `static_cast` as the equivalent of a C-style cast that does value
+     conversion, when you need to explicitly up-case a pointer from a class to
+     its superclass, or when you need to explicitly cast a pointer from a
+     superclass to a subclass. In this last case, you must be sure your object
+     is actually an instance of the subclass.
+   * Use `const_cast` to remove the `const` qualifier (see `const`_).
+   * Use `reinterpret_cast` to do unsafe conversions of pointer types to and
+     from integer and other pointer types. Use this only if you know what you
+     are doing and you understand the aliasing issues.
+
+   See the `RTII section`_ for guidance on the use of `dynamic_cast`.
+
 Streams
 -------
+
+Use streams where appropriate, and stick to "simple" usages. Overload `<<` for
+streaming only for types representing values, and write only the user-visible
+value, not any implementation details.
+
+Definition:
+   Streams are the standard I/O abstraction in C++, as exemplified by the
+   standard header `<iostream>`. They are ewidely used in Google code, but only
+   for debu logging and test diagnostcs.
+
+Pros:
+   The `<<` and `>>` stream operators provide an API for formatted I/O that is
+   easily learned, portable, reusable, and extensible. `printf`, by contrast,
+   doesn't even support `string`, to say nothing of user-defined types, and is
+   very difficult to use portably. `printf` also obliges you to choose among
+   the numerouse slightly different versions of that function, and navigate the
+   dozens of conversion specifiers.
+
+   Streams provide first-class support for console I/O via `std::cin`,
+   `std::cout`, `std::cerr`, and `std::clog`. The C APIs do as well, but are
+   hampered by the need to manally buffer the input.
+
+Cons:
+   * Stream formatting can be configured by mutating the state of the streama.
+     Such mutations are persistent, so the behavior of your code can be
+     affected by the entire previous history of the stream, unless you go out
+     of your way to restore it to a known state every time other code might
+     have touched it. User code can not only modify the built-in state, it can
+     add new state varaibles and behaviours though a registration system.
+   * It is difficult to precisely control stream output, due to the above
+     issues, the way code and data are mixed in streaming code, and the use of
+     operator overloading (which may select a different overload than you
+     expect).
+   * The practice of building up output through chains of `<<` operators
+     interferes with internationalization, because if bakes word order into the
+     code, and streams' support for localization is `flawed`_.
+   * The streams API is subtle and complex, so programmers must develop
+     experience with it in order to use it effectively.
+   * Resolving the many overloads of `<<` is extreamly costly for the compiler.
+     When used pervasibely in a large code base, it can consume as much as 20%
+     of the parsing and semantic analysis time.
+
+Decision:
+   Use stream only when they are the best tool for the job. This is typically
+   the case when the I/O is ad-hoc, local, human-readable, and targeted at
+   other developers rather then end-users. Be consitent with the code around
+   you, and with the codebase a s a whole; if there's an established tool for
+   your problem, use that tool instead.
+
+   Avoid using streams for I/O that faces external users or handles untrusted
+   dat. Instead, find and use the appropriate templating libraries to handle
+   issues like internationalization, localization, and security hardening.
+
+   If you do use streams, avoid the statful parts of the streams API (other
+   than error state), such as `imbue()`, `xalloc()`, and
+   `register_callback()`. Use explicit formatting functions rather than stream
+   manupulators for formatting flags to control formatting details such as
+   number base, precision, or padding.
+
+   Overload `<<` as a streaming operator for you type only if your type
+   represents a value, and `<<` writes out a human-readable string
+   representation of that value. Avoid exposing implementation details in the
+   output of `<<`; if you need to print object internals for debugging, use
+   named functions instead (a method named `DebugString()` is the most common
+   convention).
 
 Preincrement and Predecriment
 -----------------------------
 
+Use the prefix form (`++i`) of the increment and decrement operators with
+iterators and other template objects.
+
+Definition:
+   When a variable is incremented (`++i` or `i++`) or decemented (`--i` or
+   `i--`) and the value of the expression is not used, one must decied whether
+   to preincrement (decrement) or postincrement (decrement).
+
+Pros:
+   When the return value is ignored, the "pre" form (`++i`) is never less
+   efficient than the "post" form (`i++`), and is often more efficient. This is
+   because post-increment (or decrement) requires a copy of `i` to be made,
+   which is a valuse of the expression. If `i` is an iterator of other
+   non-scalar type, copying `i` could be expensive. Since the two types of
+   increment behave the same when the value is ignored, why not just always
+   pre-increment?
+
+Cons:
+   The tradition developed, in C, of usign prot-increment when the expression
+   value is not used, especially in `for` loops. Some find post-increment
+   easier to read, since the "subject" (`i`) precentds the "verb" (`++`), just
+   like in English.
+
+Decision:
+   For simple scalar (non-object) values there is no reason to prefer one form
+   and we allow either. For iterators and other tempalt etypes, use
+   pre-increment.
+
 Use of const
 ------------
+
+Use `const` whenever it makes sense. With C++11, `constexpr` is a better choice
+for some uses of const.
+
+Definition:
+   Declared variables and parameters can be preceded by the keyword `const` to
+   indicate the variables are not changed (e.g., `const int foo`). Class
+   functions can have the `const` qualifer to indicate the function does not
+   change the state of the class member variable (e.g., `class Foo { int
+   Bar(char c) const; };`).
+
+Pros:
+   Easier for people to understand how varaibles are being used. Allows the
+   compiler to do better type checking, and, conceivably, generate better code.
+   Helps people convince themselves of the program correctness because they
+   know the functions they call are limited in how they can modify your
+   variables. Helps people know what functions are safe to use without locks in
+   multi-trheaded programs.
+
+Cons:
+   `const` is viral: if you pass a `const` variable to a function, that
+   function must have `const` in its prototype (or the variable will need a
+   `const_cast`). This can be a particular problem when calling library
+   functions.
+
+Decision:
+   `const` variables, data members, methods are arguments add a level of
+   compile-time type checking; it is better to detect errors as soon a
+   possible. Therefore we strongly recommend that you use `const` whenever it
+   makes sense to do so:
+
+   * If a function guarantees that it will not modify an argument passed by
+     reference or by pointer, the corresponding function parameter should be a
+     reference-to-const (`const T&`) or pointer-to-const (`const T*`),
+     respectively.
+   * Declar methods to be `const` whenever possible. Accessors should almost
+     always be `const`. Other methods should be `const` if they do not modify
+     any data members, do not call any non- `const` methods, and do not return
+     a non- `const` pointer or non- `const` reference to a data member.
+   * Consider making data members `const` whenever they do not need to be
+     modified after construction.
+
+The `mutable` keyword is allowed but is unsafe when used with threads, so
+thread safety should be carefully considered first.
+
+Where to put the const
+^^^^^^^^^^^^^^^^^^^^^^
+
+Some people favor the form `int const *foo` to `const int* foo`. They argue
+that this is more readable because it's more consistent: it keeps the rule that
+`const` always follows the object it's describing. However, this consistency
+argument dosn't apply in codebases with few deeply-nested pointer expressions
+since most `const` expressions have only one `const`, and it applies to the
+underlying value. In such cases, there's no consistency to maintain. Putting
+the `const` first is arguably more readable, since it follows English in
+putting the "adjective" (`const`) before the "noun" (`int`).
+
+That said, while we encourage putting `const` first, we do not require it. But
+be consistent with the code around you!
 
 Use of constexpr
 ----------------
 
+In C++11, use `constexpr` to define true constants or to ensure constant
+initialization.
+
+Definition:
+   Some varaibles can be declared `constexpr` to indeicate the variables are
+   true constants, i.e., fixed at compilation/link time. Some functions and
+   constructors can be declared `constexpr` which enables them to be used in
+   defining a `constexpr` variable.
+
+Pros:
+   Use of `constexpr` denables definitions of constants with floating-point
+   expressions rather than just literals; definition of constants of
+   user-defined types; and definition of constants with function calls.
+
+Cons:
+   Prematurely marking something as `constexpr` may cause migration problems if
+   later on it has to be downgraded. Current restrictions on what is allowed in
+   `constexpr` functions and constructors may invite obscure workarounds in
+   these definitions.
+
+Decision:
+   `constexpr` definitions enable a more robust specification of the constant
+   parts of an interface. use `constexpr` to specify true constants and the
+   functions that support their definitions. Avoid complexifying function
+   definitions to enable their use with `constexpr`. Do not use `constexpr` to
+   force inlining.
+
 Integer Types
 -------------
+
+On Unsigned Integers
+^^^^^^^^^^^^^^^^^^^^
 
 64-bit Portability
 ------------------
@@ -1474,8 +1937,48 @@ Preprocessor Macros
 0 and nullptr/NULL
 ------------------
 
+Use `0` for integers, `0.0` for reals, `nullptr` for pointers, and `\\0` for
+chars.
+
+Use `0` for integers and `0.0` for reals.
+
+For pointers (address values), there is a choice between `0`, `NULL` and
+`nullptr`. For projects that allow C++11 features, use `nullptr`, as this
+provides type-safety.
+
+For C++03 projects, prefer `NULL` ot `0`. While the values are equivalent,
+`NULL` looks more like a pointer to the reader, and some C++ compilers provide
+special definitions of `NULL` which enable them to give useful warnings.
+
+Use `\\0` for the null characer. Using the correct type makes the code more
+readable.
+
 sizeof
 ------
+
+Prefer `sizeof(varname)` to `sizeof(type)`.
+
+Use `sizeof(varname)` when you take the size of a particular variable.
+`sizeof(varname)` will update appropriately if someone changes the variable
+type either now of later. You may use `sizeof(type)` for code unrelated to any
+particular variable, such as code that managers an external or internal data
+format where a variable of an appropriate C++ type is not convenient.
+
+.. code-block:: cpp
+
+   Struct data;
+   memset(&data, 0, sizeof(data));
+
+.. code-block:: cpp
+
+   memset(&data, 0, sizeof(Struct));
+
+.. code-block:: cpp
+
+   if (raw_size < sizeof(int)) {
+     LOG(ERROR) << "compressed record not big enough for count: " << raw_size;
+     return false;
+   }
 
 auto
 ----
@@ -1483,8 +1986,8 @@ auto
 Braced Initializer List
 -----------------------
 
-Lambdaw expressions
--------------------
+Lambda expressions
+------------------
 
 Template metaprogramming
 ------------------------

@@ -1,0 +1,5 @@
+site_name: Style Guides
+theme: readable
+pages:
+  - Home: index.md
+  - VimScript: vimscript.md

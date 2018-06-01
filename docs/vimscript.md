@@ -1,3 +1,4 @@
+[![VimScript](img/vimlogo.svg)](vimscript)
 # VimScript #
 
 **Vim Script** is the scripting language built into Vim. Based on the ex editor

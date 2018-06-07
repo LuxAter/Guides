@@ -1,5 +1,4 @@
 [![CommonLisp](img/lisplogo.svg)](lisp)
-# Common Lisp #
 
 The Common Lisp language was developed as a standardized and improved successor
 of Maclisp. Byt the early 1980s several groups wer ealready at work on diverse
@@ -15,31 +14,31 @@ application.
 
 ---
 
-## Meta-Guide ##
+# Meta-Guide ##
 
-### Must, Should, May, or Not ###
+## Must, Should, May, or Not ###
 
 Each guideline's level of importance is indicated by use fo the following
 keywords and phrases.
 
-#### MUST ####
+### MUST ####
 
 This, or the terms "REQUIRED" or "SHALL", means that the guideline is an
 absolute requirement. You must ask permission to violate a MUST
 
-#### MUST NOT ####
+### MUST NOT ####
 
 This phrase, or the phrase "SHALL NOT", means that the guideline is an absolute
 prohibition. You must ask permisson to violate a MUST NOT.
 
-#### SHOULD ####
+### SHOULD ####
 
 This word, or the adjective "RECOMMENDED", means that there may exist valid
 reasons in particular circumstances to ignore the demands of the guideline, but
 the full implications must be understood and carefully weighted before choosing
 a different course. You must ask forgiveness for violating a SHOULD.
 
-#### SHOULD NOT ####
+### SHOULD NOT ####
 
 This phrase, or the phrase "NOT RECOMMENDED", means that there may exist valid
 rasons in particular circumstances to ignore thr prohibitions of this
@@ -47,11 +46,11 @@ guideline, but the full implications should be understood and carefully
 weighted before choosing a different course. You must ask forgiveness for
 violating a SHOULD NOT.
 
-#### MAY ####
+### MAY ####
 
 This word, or the adjective "OPTIONAL", means that an item is truly optional.
 
-### Permission and Forgiveness ###
+## Permission and Forgiveness ###
 
 There are cases wher transgression of some of these rules is useful or even
 necessary. In some cases, you must seek permission or obtain forgiveness form
@@ -63,7 +62,7 @@ Forgiveness is requested in a comment near the point of guideline violation,
 and is granted by your code reviewer. The original comment should be signed by
 you, the reviewer should add a signed approval to the comment at review time.
 
-### Conventions ###
+## Conventions ###
 
 You MUST follow conventsion. They are not optional.
 
@@ -89,9 +88,9 @@ technically motivated from the parts that are mear conventions, so you know
 when best to defy conventions for good effect, and when not to fall into the
 pitfalls that the conventions are there to help avoid.
 
-## General Guidelines ##
+# General Guidelines ##
 
-### Principles ###
+## Principles ###
 
 There are some basic principles for team software development that every
 developer must keep in mind. Whenever the detailed guidelines are inadequate,
@@ -108,129 +107,129 @@ confusing or contradictory, refer back to these principles for guidance:
 * Keep related code together. Minimize the amount of jumping around someone has
     to do to understand an area of code.
 
-### Priorities ###
+## Priorities ###
 
-### Architecture ###
+## Architecture ###
 
-### Using Libraries ###
+## Using Libraries ###
 
-### Open-Sourcing Code ###
+## Open-Sourcing Code ###
 
-### Development Process ###
+## Development Process ###
 
-## Formatting ##
+# Formatting ##
 
-### Spelling and Abbreviations ###
+## Spelling and Abbreviations ###
 
-### Line Length ###
+## Line Length ###
 
-### Indentation ###
+## Indentation ###
 
-### File Header ###
+## File Header ###
 
-### Vertical Whitespace ###
+## Vertical Whitespace ###
 
-### Horizontal Whitespace ###
+## Horizontal Whitespace ###
 
-## Documentation ##
+# Documentation ##
 
-### Document Everything ###
+## Document Everything ###
 
-### Comment Semicolons ###
+## Comment Semicolons ###
 
-### Grammar and Punctuation ###
+## Grammar and Punctuation ###
 
-### Attention Required ###
+## Attention Required ###
 
-### Domain-Specific Languages ###
+## Domain-Specific Languages ###
 
-## Naming ##
+# Naming ##
 
-### Symbol Guidelines ###
+## Symbol Guidelines ###
 
-### Denote Indent, not Content ###
+## Denote Indent, not Content ###
 
-### Global Variables and Constants ###
+## Global Variables and Constants ###
 
-### Predicate Names ###
+## Predicate Names ###
 
-### Omit Library Prefixes ###
+## Omit Library Prefixes ###
 
-### Packages ###
+## Packages ###
 
-## Language Usage Guidelines ##
+# Language Usage Guidelines ##
 
-### Mostly Functional Style ###
+## Mostly Functional Style ###
 
-### Recursion ###
+## Recursion ###
 
-### Special Variables ###
+## Special Variables ###
 
-### Assignment ###
+## Assignment ###
 
-### Assertions and Conditions ###
+## Assertions and Conditions ###
 
-### Type Checking ###
+## Type Checking ###
 
-### CLOS ###
+## CLOS ###
 
-## Meta-Language Guidelines ##
+# Meta-Language Guidelines ##
 
-### Macros ###
+## Macros ###
 
-### EVAL-WHEN ###
+## EVAL-WHEN ###
 
-### Read-Time Evaluation ###
+## Read-Time Evaluation ###
 
-### EVAL ###
+## EVAL ###
 
-### INTERN and UNINTERN ###
+## INTERN and UNINTERN ###
 
-## Data Representation ##
+# Data Representation ##
 
-### NIL: empty-list, false and I Don't Know ###
+## NIL: empty-list, false and I Don't Know ###
 
-### Do not abuse lists ###
+## Do not abuse lists ###
 
-### List vs. Structures vs. Multiple Values ###
+## List vs. Structures vs. Multiple Values ###
 
-### Lists vs. Pairs ###
+## Lists vs. Pairs ###
 
-### Lists vs. Arrays ###
+## Lists vs. Arrays ###
 
-### Lists vs. Sets ###
+## Lists vs. Sets ###
 
-## Proper Forms ##
+# Proper Forms ##
 
-### Defining Constants ###
+## Defining Constants ###
 
-### Defining Functions ###
+## Defining Functions ###
 
-### Conditional Expressions ###
+## Conditional Expressions ###
 
-### Identify, Equality and Comparisions ###
+## Identify, Equality and Comparisions ###
 
-### Iteration ###
+## Iteration ###
 
-### I/O ###
+## I/O ###
 
-## Optimization ##
+# Optimization ##
 
-### Avoid Allocation ###
+## Avoid Allocation ###
 
-### Unsafe Operations ###
+## Unsafe Operations ###
 
-### DYNAMIC-EXTENT ###
+## DYNAMIC-EXTENT ###
 
-### REDUCE vs APPLY ###
+## REDUCE vs APPLY ###
 
-### Avoid NCONC ###
+## Avoid NCONC ###
 
-## Pitfalls ##
+# Pitfalls ##
 
-### #'FUN vs 'FUN ###
+## #'FUN vs 'FUN ###
 
-### Pathnames ###
+## Pathnames ###
 
-### SATISFIES ###
+## SATISFIES ###
 

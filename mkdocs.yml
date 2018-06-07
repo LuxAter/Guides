@@ -1,11 +1,22 @@
 site_name: Style Guides
-theme: readable 
+theme: readthedocs
 pages:
   - Home: index.md
-  - C:
-    - C: c.md
-    - C#: csharp.md
-    - C++: cpp.md
-    - CommonLisp: lisp.md
-  - V:
-    - VimScript: vimscript.md
+  - Ada: ada.md
+  - C: c.md
+  - C#: csharp.md
+  - C++: cpp.md
+  - F#: fsharp.md
+  - Go: go.md
+  - Java: java.md
+  - JavaScript: javascript.md
+  - Lisp: lisp.md
+  - Lua: lua.md
+  - OCaml: ocaml.md
+  - Perl: perl.md
+  - Python: python.md
+  - R: r.md
+  - Ruby: ruby.md
+  - Rust: rust.md
+  - Shell: shell.md
+  - VimScript: vimscript.md

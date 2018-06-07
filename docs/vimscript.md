@@ -1,5 +1,4 @@
 [![VimScript](img/vimlogo.svg)](vimscript)
-# VimScript #
 
 **Vim Script** is the scripting language built into Vim. Based on the ex editor
 language of the original vi editor, early versions of Vim added commands for
@@ -9,15 +8,15 @@ object-oriented programming. Built-in functions such as `map()` and `filter()`
 allow a basic form of functional programming, and Vim script has lambda since
 version 8.0. Vim script is mostly written in an imperative programming style.
 
----
+* * *
 
-## Portability ##
+# Portability
 
 It's hard to get vimscript right. Many commands depend upon the user;s
 settings. By following these guidelines, you can hope to make your scripts
 portable.
 
-### Strings ###
+## Strings
 
 Prefer single quoted strings
 
@@ -27,7 +26,7 @@ don't want them (they break regexes).
 Use double quoted string when you need an escape sequence (such as `"\n"`) or
 if you know it doesn't matter and you need to embed single quotes.
 
-### Matching Strings ###
+## Matching Strings
 
 Use the `=~#` or `=~?` operator families over the `=~` family.
 
@@ -37,7 +36,7 @@ operators. Use the `=~#` and `=~?` operator families explicitly when comparing
 strings unless you explicitly need to honor the user's case sensitivit
 settings.
 
-### Regular Expressions ###
+## Regular Expressions
 
 Prefer all regexes with `\m\C`.
 
@@ -48,7 +47,7 @@ set, preend all regexes with `\m\C`.
 You are welcome to use other magic levels (`\v`) and case sensitivities (`\c`)
 so long as they are intentional and explicit.
 
-### Dangerous Commands ###
+## Dangerous Commands
 
 Avoid commands with unintended side effects.
 
@@ -58,7 +57,7 @@ Prefer functions (such as `search()`) better suited to scripts.
 For many vim commands, functoins exist that do the same thing with fewer side
 effects. See `:help function()` for a list of build-in functions.
 
-### Fragile Commands ###
+## Fragile Commands
 
 Avoid commands that rely on user settings.
 
@@ -69,24 +68,24 @@ Avoid `:a[ubstitute]`, as its behavior depends upon a number of local settings.
 
 The sam eapplies to other commands not listed here.
 
-### Catching Exceptions ###
+## Catching Exceptions
 
 Match error codes, not error text.
 
 Error text may be locale dependant.
 
-## General Guidelines ##
+# General Guidelines
 
-### Messaging ###
+## Messaging
 
 Message the user infrequently.
 
 Loud scripts are annoying. Message the user only when:
 
-* A long-running process has kicked off.
-* An error has occured.
+-   A long-running process has kicked off.
+-   An error has occured.
 
-### Type Checking ###
+## Type Checking
 
 Use strict and explicit checks where possible.
 
@@ -102,14 +101,14 @@ own errors.
 Use `:unlet` for variables that may change types, particularly those assigned
 inside loops.
 
-### Python ###
+## Python
 
 Use sparingly.
 
 Use python only when it provides critical functionality, for example when
 writing threaded code.
 
-### Other Languages ###
+## Other Languages
 
 Use vimscript instead
 
@@ -117,15 +116,15 @@ Avoid using other scripting languages such as ruby and lua. We cannot guarantee
 that the end user's vim has been compiled with support for non-vimscript
 languages.
 
-### Boilerplate ###
+## Boilerplate
 
 Plugin boilerplate includes
 
-* Plugin creation
-* Error handling
-* Dependency checking
+-   Plugin creation
+-   Error handling
+-   Dependency checking
 
-### Plugin Layout ###
+## Plugin Layout
 
 Organize functionality into modular plugins
 
@@ -135,7 +134,7 @@ suffix if desired). It should be split into `plugin/`, `autoload/`, etc.
 subdirectories as necessary, and it should delcar metadata in the
 addon-info.json format.
 
-### Functions ###
+## Functions
 
 In the `autoload/` directory, defined with `[!]` and `[abort]`.
 
@@ -152,7 +151,7 @@ should be extracted into functions and autoloaded.
 
 `[abort]` forces the function to halt when it encounters an error.
 
-### Commands ###
+## Commands
 
 In the `plugin/commands.vim` or under the `ftplugin/` directory, defined
 without `[!]`.
@@ -163,7 +162,7 @@ General commands go in `plugin/commands.vim`. Filetype-specific commands go in
 Excluding `[!]` prevents your plugin from silently clobbering existing
 commands. Command conflicts should be resolved by the user.
 
-### Autocommands ###
+## Autocommands
 
 Place them in `plugin/autocmds.vim`, within augroups.
 
@@ -175,7 +174,7 @@ the plugin name.
 Clear the augroup with `autocmd!` before defining new autocommands in the
 augroup. This makes your plugin re-entrable.
 
-### Mappings ###
+## Mappings
 
 Place them in `plugin/mappings.vim`, using a prefix.
 
@@ -184,51 +183,55 @@ All key mappings sould be defined in `plugin/mappings.vim`.
 Partial mappings (see `:help using-<Plug>`) should be defined in
 `plugin/plugs.vim`.
 
-### Settings ###
+## Settings
 
 Change settings locally.
 
 Use `:setlocal` and `&l:` instead of `:set` and `&` unless you have explicit
 reason to do otherwise.
 
-## Style ##
+# Style
 
 When in doubt, treat vimscript style like python style.
 
-### Whitespace ###
+## Whitespace
 
 Similar to python.
 
-* Use two spaces for indents
-* DO not use tabs
-* Use spaces around operators. This does not apply to arguments to commands.
+-   Use two spaces for indents
+-   Do not use tabs
+-   Use spaces around operators. This does not apply to arguments to commands.
+
 ```viml
 let s:variable = "concatenated " . "strings"
 command -range=% MyCommand
 ```
-* Do not introduce trailing whitespace. You need not go out of your way to
-    remove it. Trailing whitespace is allowed in mappings which prep commands
-    for user input such as "`noremap <leader>gf :grep -f `".
-* Restrict lines to 80 colmns wide
-* Indent continued lines by four spaces
-* Do not align argumentes of commands
+
+-   Do not introduce trailing whitespace. You need not go out of your way to
+      remove it. Trailing whitespace is allowed in mappings which prep commands
+      for user input such as "`noremap <leader>gf :grep -f`".
+-   Restrict lines to 80 colmns wide
+-   Indent continued lines by four spaces
+-   Do not align argumentes of commands
 
 ```viml
 command -bang MyCommand call myplugin#foo()
 command MyCommand2 call myplugin#bar()
 ```
 
-### Naming ###
+## Naming
 
 In general, use `plugin-names-like-this`, `FunctionNamesLiekThis`,
 `CommandNamesLiekThis`, `augroup_names_like_this`, `variable_names_like_this`.
 
 Always prefer variables with their scope
 
-#### plugin-names-like-this ####
+### plugin-names-like-this
+
 Keep them short and sweet.
 
-#### FunctionNamesLikeThis ####
+### FunctionNamesLikeThis
+
 Prefix script-local functions with `s:`.
 
 Autoloaded functions may not have a
@@ -237,20 +240,22 @@ scope prefix.
 Do not create global functions. Use autoloaded functions
 instead.
 
-#### CommandNamesLikeThis ####
+### CommandNamesLikeThis
+
 Prefer succinct command names over common command prefixes.
 
-#### variable_names_like_this ####
+### variable_names_like_this
+
 Augroup names count as variables for naming purposes.
 
-#### Prefix all variables with their scope ####
+### Prefix all variables with their scope
 
-* Global variables with `g:`
-* Script-local variables with `s:`
-* Function arguments with `a:`
-* Function-local variables with `l:`
-* Vim-predefined variables with `v:`
-* Buffer-local variables with `b:`
+-   Global variables with `g:`
+-   Script-local variables with `s:`
+-   Function arguments with `a:`
+-   Function-local variables with `l:`
+-   Vim-predefined variables with `v:`
+-   Buffer-local variables with `b:`
 
 `g:`, `s:`, and `a:` must always be used.
 
